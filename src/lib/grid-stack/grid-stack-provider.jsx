@@ -39,11 +39,73 @@ export function GridStackProvider({ children, initialOptions }) {
 
   useLayoutEffect(() => {
     if (!gridStack && containerRef.current) {
-      // Initialize GridStack if needed
-      // const gs = GridStackLib.init(initialOptions, containerRef.current);
-      // setGridStack(gs);
+      const rootGridEl = containerRef.current.querySelector('.grid-stack');
+      const existingInstance = rootGridEl?.gridstack;
+
+      if (!existingInstance) {
+        console.warn("⚠️ No GridStack instance found in .grid-stack under containerRef");
+        return;
+      }
+
+      existingInstance.on('added', (_, nodes) => {
+        console.log('[gridstack] widget added:', nodes.map(n => n.id));
+      });
+
+      existingInstance.on('resizestart', (_, el) => {
+        const id = el?.gridstackNode?.id;
+        console.log('[root] resizestart:', id);
+
+        if (id !== 'main-sub-grid') return;
+
+        const subGridEl = el.querySelector('.grid-stack');
+        const subInstance = subGridEl?.gridstack;
+        if (!subInstance) {
+          console.warn("⚠️ subgrid instance not found");
+          return;
+        }
+
+        const items = subInstance.getGridItems();
+        items.forEach((item) => {
+          subInstance.update(item, { w: 1, h: 1 });
+        });
+
+        console.log('[main-sub-grid] resized all items to 1x1 on resizestart');
+      });
+
+
+      existingInstance.on('resizestop', (_, el) => {
+        const id = el?.gridstackNode?.id;
+        console.log('[root] resizestop:', id);
+
+        if (id !== 'main-sub-grid') return;
+
+        const subGridEl = el.querySelector('.grid-stack');
+        const subInstance = subGridEl?.gridstack;
+        if (!subInstance) {
+          console.warn("⚠️ subgrid instance not found");
+          return;
+        }
+
+        const items = subInstance.getGridItems();
+        const columns = subInstance.getColumn();
+        let x = 0, y = 0;
+
+        items.forEach((item) => {
+          subInstance.update(item, { x, y });
+          x += 1;
+          if (x >= columns) {
+            x = 0;
+            y += 1;
+          }
+        });
+
+        console.log('[main-sub-grid] repositioned items on resizestop');
+      });
+
+
+      setGridStack(existingInstance);
     }
-  }, [gridStack, initialOptions]);
+  }, [gridStack]);
 
   const genRandomId = () =>
     `widget-${Math.random().toString(36).substring(2, 15)}`;

@@ -39,37 +39,61 @@ const COLORS = [
 
 const LETTER_IDS = Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZ").filter((c) => c !== "K" && c !== "P");
 
-function SaveButton({ setCopiedOptions }) {
+export function SaveButton({ setCopiedOptions }) {
   const { saveOptions } = useGridStackContext();
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const saved = saveOptions?.();
-    if (saved && typeof saved === "object" && "children" in saved) {
-      console.log("📦 Saved Grid:", saved);
-      setCopiedOptions?.(structuredClone(saved));
-    } else {
+    if (!saved || typeof saved !== "object" || !("children" in saved)) {
       console.warn("⚠️ Failed to save grid state:", saved);
+      return;
+    }
+
+    console.log("📦 Saved Grid:", saved);
+    setCopiedOptions?.(structuredClone(saved));
+
+    try {
+      const res = await fetch("/api/solve", {
+        method: "POST",
+        body: JSON.stringify(saved),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        console.error("❌ Server returned error:", await res.text());
+        // alert("Server error during solving.");
+        return;
+      }
+
+      // alert("✅ Grid state sent to server successfully.");
+    } catch (err) {
+      console.error("❌ Failed to POST saved grid:", err);
+      // alert("Failed to send grid to server.");
     }
   };
 
   return (
     <button onClick={handleSave} className="bg-green-600 px-4 py-2 text-white">
-      💾 Save Grid
+      💾 Save & Solve
     </button>
   );
 }
 
 export function AddExit() {
-  const { addWidget, gridStack } = useGridStackContext();
-  const handleAdd = () => {
-    const mainWidgetCount = gridStack?.engine.nodes.length ?? 0;
+  const { addWidget, gridStack, _rawWidgetMetaMap } = useGridStackContext();
 
-    if (mainWidgetCount >= 2) {
-      alert("Main Grid can only contain one widget.");
+  const handleAdd = () => {
+    const id = "K";
+
+    // ✅ Check if a widget with ID "K" already exists
+    if (_rawWidgetMetaMap.value.has(id)) {
+      // alert("Exit (K) has already been added.");
       return;
     }
-    const id = "K";
-    const color = "bg-black"
+
+    const color = "bg-black";
     const text = id;
 
     const widget = {
@@ -83,13 +107,14 @@ export function AddExit() {
       group: "main",
       content: JSON.stringify({
         name: "Block",
-        props: { color,text },
+        props: { color, text },
       }),
     };
+
     if (gridStack?.willItFit(widget)) {
       addWidget(() => widget);
     } else {
-      alert("Main Grid is full.");
+      // alert("Main Grid is full.");
     }
   };
 
@@ -106,7 +131,7 @@ export function AddObstacle() {
 
   const handleAdd = () => {
     if (index >= LETTER_IDS.length) {
-      alert("Max 25 widgets reached.");
+      // alert("Max 25 widgets reached.");
       return;
     }
 
@@ -145,7 +170,7 @@ export function AddPrimaryVehicle() {
   const handleAdd = () => {
     // Check if widget with id "P" is already present
     if (_rawWidgetMetaMap.value.has("P")) {
-      alert("Primary vehicle (P) has already been added.");
+      // alert("Primary vehicle (P) has already been added.");
       return;
     }
 
@@ -183,7 +208,7 @@ export function AddPrimaryVehicle() {
 export function GridStackComponent() {
     const [copiedOptions, setCopiedOptions] = useState("");
     const [widthUnits, setWidthUnits] = useState(6);
-    const [cellHeight, setCellHeight] = useState(60);
+    const cellHeight = 60;
 
     const BASE_GRID_OPTIONS = {
         locked:true,
@@ -211,7 +236,7 @@ export function GridStackComponent() {
                 // sizeToContent: true,
                 subGridOpts: {
                     acceptWidgets: ".grid-stack-item[data-gs-group='sub']",
-                    column: "auto",
+                    // column: "auto",
                     float: true,
                     margin: 5,
                     cellHeight: cellHeight,
@@ -239,16 +264,6 @@ export function GridStackComponent() {
                         className="border border-gray-300 rounded px-2 py-1 w-20 ml-2"
                         />
                     </label>
-                    {/* <label className="text-sm">
-                        Cell Height:
-                        <input
-                        type="number"
-                        min="10"
-                        value={cellHeight}
-                        onChange={(e) => setCellHeight(parseInt(e.target.value, 10) || 10)}
-                        className="border border-gray-300 rounded px-2 py-1 w-20 ml-2"
-                        />
-                    </label> */}
                 </div>
                
                 <div className="flex h-fit">
