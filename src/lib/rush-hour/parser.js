@@ -20,7 +20,7 @@ function readInputBoard(inputText) {
 	let [rows, colsConfig] = lines[0].split(" ").map(Number);
 	let cols = Math.max(...lines.slice(2).map((line) => line.length));
 
-	const numPieces = Number(lines[1]);
+	const numVehicles = Number(lines[1]);
 	const boardAll = lines.slice(2);
 
 	let kPosition = null;
@@ -101,7 +101,7 @@ function readInputBoard(inputText) {
 	return {
 		rows,
 		cols: colsConfig,
-		numPieces,
+		numVehicles,
 		board: boardMain,
 		kPosition,
 	};

@@ -1,10 +1,14 @@
 .grid-stack {
-  background: #FAFAD2;
+  background: #A9A9A9;
 }
 
 .grid-stack-item-content {
   text-align: center;
   /* background-color: #18bc9c; */
+  overflow: visible;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+              0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  border-radius: 0.375rem;
 }
 
 .grid-stack-item-removing {
@@ -15,7 +19,7 @@
 
 /* make nested grid have slightly darker bg take almost all space (need some to tell them apart) so items inside can have similar to external size+margin */
 .grid-stack > .grid-stack-item.grid-stack-sub-grid > .grid-stack-item-content {
-  background: rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.2);
   /* inset: 8px 8px; */
   inset: 0;
   /* overflow: hidden; */

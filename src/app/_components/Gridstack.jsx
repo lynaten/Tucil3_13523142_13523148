@@ -18,34 +18,26 @@ const COLORS = [
   "bg-red-700",
   "bg-blue-400",
   "bg-purple-400",
-  "bg-orange-700",
   "bg-green-400",
   "bg-fuchsia-400",
   "bg-purple-600",
   "bg-yellow-400",
   "bg-emerald-600",
-  "bg-fuchsia-600",
   "bg-indigo-400",
   "bg-pink-400",
   "bg-red-600",
   "bg-teal-500",
   "bg-teal-400",
   "bg-green-600",
-  "bg-yellow-500",
   "bg-fuchsia-500",
   "bg-purple-500",
   "bg-blue-600",
-  "bg-indigo-500",
   "bg-orange-500",
-  "bg-green-500",
   "bg-pink-600",
-  "bg-rose-600",
-  "bg-emerald-400",
   "bg-red-500",
-  "bg-blue-500",
-  "bg-rose-500",
-  "bg-teal-600",
 ];
+
+const LETTER_IDS = Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZ").filter((c) => c !== "K" && c !== "P");
 
 function SaveButton({ setCopiedOptions }) {
   const { saveOptions } = useGridStackContext();
@@ -67,40 +59,125 @@ function SaveButton({ setCopiedOptions }) {
   );
 }
 
-export function AddWidgetButton() {
+export function AddExit() {
   const { addWidget, gridStack } = useGridStackContext();
-  const [index, setIndex] = useState(0);
-
   const handleAdd = () => {
-    const color = COLORS[index % COLORS.length];
+    const mainWidgetCount = gridStack?.engine.nodes.length ?? 0;
+
+    if (mainWidgetCount >= 2) {
+      alert("Main Grid can only contain one widget.");
+      return;
+    }
+    const id = "K";
+    const color = "bg-black"
+    const text = id;
+
     const widget = {
+      id,
       x: 0,
       y: 0,
       w: 1,
       h: 1,
-      locked:true,
+      locked: true,
+      group: "main",
       content: JSON.stringify({
         name: "Block",
-        props: {
-          color,
-        },
+        props: { color,text },
       }),
     };
-
     if (gridStack?.willItFit(widget)) {
       addWidget(() => widget);
-      setIndex((prev) => (prev + 1) % COLORS.length);
     } else {
-      alert("Grid is full. Cannot add more widgets.");
+      alert("Main Grid is full.");
     }
   };
 
   return (
     <button onClick={handleAdd} className="bg-blue-600 px-4 py-2 text-white">
-      ➕ Add Widget
+      ➕ Add Exit
     </button>
   );
 }
+
+export function AddObstacle() {
+  const { addWidget } = useGridStackContext();
+  const [index, setIndex] = useState(0);
+
+  const handleAdd = () => {
+    if (index >= LETTER_IDS.length) {
+      alert("Max 25 widgets reached.");
+      return;
+    }
+
+    const id = LETTER_IDS[index];
+    const color = COLORS[index % COLORS.length];
+    const text = id;
+
+    const widget = {
+      id,
+      x: 0,
+      y: 0,
+      w: 1,
+      h: 1,
+      locked: true,
+      group: "sub",
+      content: JSON.stringify({
+        name: "Block",
+        props: { color, text },
+      }),
+    };
+    addWidget(() => widget, "main-sub-grid");
+    setIndex((prev) => prev + 1);
+  };
+
+  return (
+    <button onClick={handleAdd} className="bg-purple-600 px-4 py-2 text-white">
+      ➕ Add Obstacle 
+    </button>
+  );
+}
+
+export function AddPrimaryVehicle() {
+  const { addWidget, _rawWidgetMetaMap } = useGridStackContext(); // ✅ use raw map for ID check
+  const [index, setIndex] = useState(0);
+
+  const handleAdd = () => {
+    // Check if widget with id "P" is already present
+    if (_rawWidgetMetaMap.value.has("P")) {
+      alert("Primary vehicle (P) has already been added.");
+      return;
+    }
+
+    const id = "P";
+    const color = "bg-white";
+    const text = id;
+    const textColor = "text-black";
+
+    const widget = {
+      id,
+      x: 0,
+      y: 0,
+      w: 1,
+      h: 1,
+      locked: true,
+      group: "sub",
+      content: JSON.stringify({
+        name: "Block",
+        props: { color, text, textColor },
+      }),
+    };
+
+    addWidget(() => widget, "main-sub-grid");
+    setIndex((prev) => prev + 1);
+  };
+
+  return (
+    <button onClick={handleAdd} className="bg-yellow-600 px-4 py-2 text-white">
+      ➕ Add Primary Vehicle
+    </button>
+  );
+}
+
 
 export function GridStackComponent() {
     const [copiedOptions, setCopiedOptions] = useState("");
@@ -109,7 +186,7 @@ export function GridStackComponent() {
 
     const BASE_GRID_OPTIONS = {
         locked:true,
-        acceptWidgets: true,
+        acceptWidgets: ".grid-stack-item[data-gs-group='main']",
         columnOpts: {
             columnWidth: cellHeight,
             columnMax: 100,
@@ -132,7 +209,7 @@ export function GridStackComponent() {
                 locked:true,
                 // sizeToContent: true,
                 subGridOpts: {
-                    acceptWidgets: true,
+                    acceptWidgets: ".grid-stack-item[data-gs-group='sub']",
                     column: "auto",
                     float: true,
                     margin: 5,
@@ -174,7 +251,9 @@ export function GridStackComponent() {
                 </div>
                
                 <div className="flex h-fit">
-                    <AddWidgetButton/>
+                    <AddExit />
+                    <AddObstacle />
+                    <AddPrimaryVehicle />
                     <SaveButton setCopiedOptions={setCopiedOptions} />
                     <div className="trash w-10 h-10 bg-red-300 flex justify-center items-center">
                         🗑️

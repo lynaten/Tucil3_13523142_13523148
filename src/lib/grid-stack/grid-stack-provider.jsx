@@ -49,42 +49,45 @@ export function GridStackProvider({ children, initialOptions }) {
     `widget-${Math.random().toString(36).substring(2, 15)}`;
 
   const addWidget = useCallback(
-    (fn) => {
-      const newId = genRandomId();
-      console.log("🆕 Generated new widget ID:", newId);
+  (fn, targetId) => {
+    const tempWidget = fn();
+    const newId = tempWidget.id ?? genRandomId();
+    const widget = fn(newId);
+    widget.id = newId;
 
-      const widget = fn(newId);
+    if (gridStack) {
+      let target = gridStack;
 
-      console.group(`📦 Debugging widget for ID: ${newId}`);
-      console.log("➡ Full Widget:", widget);
-      console.log("📏 Dimensions:", {
-        x: widget.x,
-        y: widget.y,
-        w: widget.w,
-        h: widget.h,
-      });
-      console.log("📜 Content:", widget.content ?? "❌ No content");
-      if (widget.subGridOpts) {
-        console.log("🔁 SubGrid Options:", widget.subGridOpts);
-      }
-      console.groupEnd();
-
-      if (gridStack) {
-        console.log("🧱 gridStack is ready. Adding widget to GridStack...");
-        gridStack.addWidget({ ...widget, id: newId });
-      } else {
-        console.warn("⚠️ gridStack is null. Skipping gridStack.addWidget.");
+      if (targetId) {
+        const subGridEl = gridStack.el.querySelector(`[gs-id="${targetId}"] .grid-stack`);
+        
+        if (subGridEl) {
+          const subGridInstance = subGridEl.gridstack; // ✅ Safest way
+          if (subGridInstance?.addWidget) {
+            target = subGridInstance;
+          } else {
+            console.warn(`⚠️ Sub-grid element found but GridStack instance not ready yet.`);
+          }
+        } else {
+          console.warn(`⚠️ Could not find sub-grid element for: ${targetId}. Adding to root.`);
+        }
       }
 
-      setRawWidgetMetaMap((prev) => {
-        const newMap = new Map(prev);
-        newMap.set(newId, widget);
-        console.log("📝 Updated rawWidgetMetaMap with ID:", newId);
-        return newMap;
-      });
-    },
-    [gridStack]
-  );
+      target.addWidget({ ...widget, id: newId });
+    } else {
+      console.warn("⚠️ gridStack is null. Skipping gridStack.addWidget.");
+    }
+
+    setRawWidgetMetaMap((prev) => {
+      const newMap = new Map(prev);
+      newMap.set(newId, widget);
+      return newMap;
+    });
+  },
+  [gridStack]
+);
+
+
 
   const addSubGrid = useCallback(
     (fn) => {
@@ -131,7 +134,7 @@ export function GridStackProvider({ children, initialOptions }) {
       if (!gridStack) return;
       const el = document.querySelector(`[gs-id="${id}"]`);
       if (el) {
-        gridStack.update(el, { x, y });
+        gridStack.move(el, { x, y });
       }
     },
     [gridStack]
