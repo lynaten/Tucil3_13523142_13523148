@@ -78,6 +78,7 @@ export function AddWidgetButton() {
       y: 0,
       w: 1,
       h: 1,
+      locked:true,
       content: JSON.stringify({
         name: "Block",
         props: {
@@ -101,19 +102,96 @@ export function AddWidgetButton() {
   );
 }
 
-export function GridStackComponent({ initialOptions }) {
+export function GridStackComponent() {
     const [copiedOptions, setCopiedOptions] = useState("");
+    const [widthUnits, setWidthUnits] = useState(6);
+    const [cellHeight, setCellHeight] = useState(60);
+
+    const BASE_GRID_OPTIONS = {
+        locked:true,
+        acceptWidgets: true,
+        columnOpts: {
+            columnWidth: cellHeight,
+            columnMax: 100,
+            layout: "moveScale",
+            breakpointForWindow: false,
+        },
+        float: true,
+        itemClass: "grid-stack-item",
+        margin: 5,
+        cellHeight: cellHeight,
+        removable: ".trash",
+
+        children: [
+            {
+                id: "main-sub-grid",
+                x: 0,
+                y: 0,
+                w: 6,
+                h: 1,
+                locked:true,
+                // sizeToContent: true,
+                subGridOpts: {
+                    acceptWidgets: true,
+                    column: "auto",
+                    float: true,
+                    margin: 5,
+                    cellHeight: cellHeight,
+                    itemClass: "grid-stack-item",
+                    removable: ".trash",
+                    layout: "list",
+                    minRow: 1,
+                },
+            },
+        ],
+        };
+
+    
     return (
-        <GridStackProvider initialOptions={initialOptions}>
-            <AddWidgetButton />
-            <SaveButton setCopiedOptions={setCopiedOptions} />
-            <GridstackInner />
-            {copiedOptions && (
-                <div className="mt-4 p-2 bg-gray-100 w-full text-sm whitespace-pre-wrap break-all border border-gray-300 rounded">
-                    <strong>Saved Grid (JSON):</strong>
-                    <pre className=" whitespace-pre-wrap break-all">{JSON.stringify(copiedOptions.children, null, 2)}</pre>
+        <GridStackProvider initialOptions={BASE_GRID_OPTIONS}>
+            <div className="w-fit flex flex-col justify-center items-center">
+                <div className="flex flex-col gap-2 items-start mb-2">
+                    <label className="text-sm">
+                        Grid columns:
+                        <input
+                        type="number"
+                        min="1"
+                        value={widthUnits}
+                        onChange={(e) => setWidthUnits(parseInt(e.target.value, 10) || 1)}
+                        className="border border-gray-300 rounded px-2 py-1 w-20 ml-2"
+                        />
+                    </label>
+                    {/* <label className="text-sm">
+                        Cell Height:
+                        <input
+                        type="number"
+                        min="10"
+                        value={cellHeight}
+                        onChange={(e) => setCellHeight(parseInt(e.target.value, 10) || 10)}
+                        className="border border-gray-300 rounded px-2 py-1 w-20 ml-2"
+                        />
+                    </label> */}
                 </div>
-            )}
+               
+                <div className="flex h-fit">
+                    <AddWidgetButton/>
+                    <SaveButton setCopiedOptions={setCopiedOptions} />
+                    <div className="trash w-10 h-10 bg-red-300 flex justify-center items-center">
+                        🗑️
+                    </div>
+                </div>
+                <div style={{ width: `${widthUnits * cellHeight}px` }} className="max-w-screen overflow-x-auto mb-16">
+                    <GridstackInner />
+                </div>
+                
+                {copiedOptions && (
+                    <div style={{ width: `${widthUnits * cellHeight}px` }} className="max-w-screen mt-4 p-2 bg-gray-100 text-sm whitespace-pre-wrap break-all border border-gray-300 rounded">
+                        <strong>Saved Grid (JSON):</strong>
+                        <pre className=" whitespace-pre-wrap break-all">{JSON.stringify(copiedOptions, null, 2)}</pre>
+                    </div>
+                )}
+            </div>
+            
         </GridStackProvider>
     );
 }
