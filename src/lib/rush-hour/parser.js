@@ -1,13 +1,14 @@
 const fs = require("fs");
 
+// ! FOR TESTING
 // input path file
-const inputPath = process.argv[2];
-if (!inputPath) {
-	console.error("File input invalid!");
-	process.exit(1);
-}
+// const inputPath = process.argv[2];
+// if (!inputPath) {
+// 	console.error("File input invalid!");
+// 	process.exit(1);
+// }
 
-const inputText = fs.readFileSync(inputPath, "utf-8");
+// const inputText = fs.readFileSync(inputPath, "utf-8");
 
 function boardToString(board) {
 	return board.map((row) => row.join("")).join("\n");
@@ -54,7 +55,7 @@ function readInputBoard(inputText) {
 			let kRow = -1;
 			let onlyK = true;
 			for (let r = 0; r < tempBoard.length; r++) {
-				console.log(r, c);
+				// console.log(r, c);
 				const cell = tempBoard[r][c];
 				if (cell === "K") {
 					if (kRow === -1) {
@@ -107,10 +108,10 @@ function readInputBoard(inputText) {
 }
 
 // TESTING
-const parsedInput = readInputBoard(inputText);
+// const parsedInput = readInputBoard(inputText);
 
-console.log(parsedInput);
+// console.log(parsedInput);
 
-console.log("\nStringified:\n" + boardToString(parsedInput.board));
+// console.log("\nStringified:\n" + boardToString(parsedInput.board));
 
-module.exports = { readInputBoard };
+module.exports = { readInputBoard, boardToString };
