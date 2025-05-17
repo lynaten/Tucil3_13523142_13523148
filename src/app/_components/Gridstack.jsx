@@ -79,6 +79,7 @@ export function AddExit() {
       w: 1,
       h: 1,
       locked: true,
+      noResize: true,
       group: "main",
       content: JSON.stringify({
         name: "Block",
