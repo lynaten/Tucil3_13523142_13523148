@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { GridStackProvider } from "@/lib/grid-stack-provider";
-import { useGridStackContext } from "@/lib/grid-stack-context";
+import { GridStackProvider } from "@/lib/grid-stack/grid-stack-provider";
+import { useGridStackContext } from "@/lib/grid-stack/grid-stack-context";
 
 import "gridstack/dist/gridstack.css";
 import "../../styles/gridstackreact.css";
@@ -102,10 +102,18 @@ export function AddWidgetButton() {
 }
 
 export function GridStackComponent({ initialOptions }) {
-  return (
-    <GridStackProvider initialOptions={initialOptions}>
-      <AddWidgetButton />
-      <GridstackInner />
-    </GridStackProvider>
-  );
+    const [copiedOptions, setCopiedOptions] = useState("");
+    return (
+        <GridStackProvider initialOptions={initialOptions}>
+            <AddWidgetButton />
+            <SaveButton setCopiedOptions={setCopiedOptions} />
+            <GridstackInner />
+            {copiedOptions && (
+                <div className="mt-4 p-2 bg-gray-100 w-full text-sm whitespace-pre-wrap break-all border border-gray-300 rounded">
+                    <strong>Saved Grid (JSON):</strong>
+                    <pre className=" whitespace-pre-wrap break-all">{JSON.stringify(copiedOptions.children, null, 2)}</pre>
+                </div>
+            )}
+        </GridStackProvider>
+    );
 }
