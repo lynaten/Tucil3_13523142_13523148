@@ -15,15 +15,27 @@ export default function GridDemoPage() {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("/api/solve", {
-      method: "POST",
-      body: formData,
-    });
+    const solver = "astar"; // atau "ucs", "greedy"
 
-    if (res.ok) {
-      alert("✅ File uploaded and processed!");
-    } else {
-      alert("❌ Failed to process file.");
+    try {
+      const res = await fetch(`/api/solve?solver=${solver}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.error || "Failed to process file.");
+        console.error("Server returned error:", err);
+        return;
+      }
+
+      const data = await res.json();
+      console.log("Response returned:", data);
+      alert("File uploaded and processed!");
+    } catch (err) {
+      console.error("Network error:", err);
+      alert("Network or unexpected error.");
     }
   };
 

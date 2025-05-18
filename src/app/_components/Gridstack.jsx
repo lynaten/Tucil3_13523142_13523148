@@ -45,34 +45,43 @@ export function SaveButton({ setCopiedOptions }) {
 	const { saveOptions } = useGridStackContext();
 
 	const handleSave = async () => {
-		const saved = saveOptions?.();
-		if (!saved || typeof saved !== "object" || !("children" in saved)) {
-			console.warn("Failed to save grid state:", saved);
-			return;
-		}
+    const saved = saveOptions?.();
 
-		console.log("Saved Grid:", saved);
-		setCopiedOptions?.(structuredClone(saved));
+    if (!saved || typeof saved !== "object" || !("children" in saved)) {
+      console.warn("Failed to save grid state:", saved);
+      return;
+    }
 
-		try {
-			const res = await fetch("/api/solve", {
-				method: "POST",
-				body: JSON.stringify(saved),
-				headers: {
-					"Content-Type": "application/json",
-				},
-			});
+    setCopiedOptions?.(structuredClone(saved));
+    console.log("Saved Grid:", saved);
 
-			if (!res.ok) {
-				console.error("Server returned error:", await res.text());
-				return;
-			}
+    const solver = "astar"; // atau "ucs", "greedy"
 
-			alert("Grid state sent to server successfully.");
-		} catch (err) {
-			console.error("Failed to POST saved grid:", err);
-		}
-	};
+    try {
+      const res = await fetch(`/api/solve?solver=${solver}`, {
+        method: "POST",
+        body: JSON.stringify(saved),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.error || "Failed to process grid.");
+        console.error("Server returned error:", err);
+        return;
+      }
+
+      const data = await res.json();
+      console.log("Response returned:", data);
+      
+      alert("Grid state sent to server successfully.");
+    } catch (err) {
+      console.error("Network error:", err);
+      alert("Network or unexpected error.");
+    }
+  };
 
 	return (
 		<button

@@ -50,7 +50,7 @@ function readInputBoard(inputText) {
   }
 
   if (!kPosition) {
-    throw new Error("No exit 'K' found on any side");
+    throw new Error("Missing exit 'K' in the grid");
   }
 
   const board = rawRows.slice(0, rows).map(line => {

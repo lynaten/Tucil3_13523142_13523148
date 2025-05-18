@@ -39,6 +39,7 @@ function getVehiclePositions(board) {
 
 function buildVehicleInfo(rawMap) {
 	const vehicles = new Map();
+	let hasPrimary = false;
 
 	for (const [symbol, positions] of rawMap.entries()) {
 		const rows = positions.map((p) => p[0]);
@@ -51,9 +52,22 @@ function buildVehicleInfo(rawMap) {
 
 		const width = maxCol - minCol + 1;
 		const height = maxRow - minRow + 1;
+
+		if (width === 1 && height === 1) {
+			throw new Error(`Vehicle '${symbol}' is only 1x1 — this is not allowed.`);
+		}
+
+		if (width > 1 && height > 1) {
+			throw new Error(`Vehicle '${symbol}' is ${width}x${height} — must be strictly horizontal or vertical.`);
+		}
+
 		const orientation = width > height ? "H" : "V";
 		const length = Math.max(width, height);
 		const isPrimary = symbol === "P";
+
+		if (isPrimary) {
+			hasPrimary = true;
+		}
 
 		vehicles.set(symbol, {
 			symbol,
@@ -65,6 +79,10 @@ function buildVehicleInfo(rawMap) {
 			length,
 			isPrimary,
 		});
+	}
+
+	if (!hasPrimary) {
+		throw new Error("Missing primary vehicle 'P' in the grid");
 	}
 
 	return vehicles;

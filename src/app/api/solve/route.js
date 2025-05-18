@@ -3,9 +3,50 @@ import { parseGridStackJSON } from "@/lib/rush-hour/fromGridStack";
 import { readInputBoard, boardToString } from "@/lib/rush-hour/parser";
 import { extractVehicles } from "@/lib/rush-hour/extractor";
 
-async function runAllSolvers(gameState) {
-  const game = new Game(gameState);
+export async function POST(req) {
+  const url     = new URL(req.url);
+  const solverQ = url.searchParams.get("solver");
+  let gameState;
 
+  if (!solverQ) {
+    return new Response(
+      JSON.stringify({ error: "Missing solver query parameter" }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  try {
+    const contentType = req.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      const json = await req.json();
+      gameState  = parseGridStackJSON(json);
+    }
+    else if (contentType.includes("multipart/form-data")) {
+      const form    = await req.formData();
+      const file    = form.get("file");
+      if (!file || typeof file === "string") {
+        throw new Error("Invalid file upload");
+      }
+      const text    = await file.text();
+      const parsed  = readInputBoard(text);
+      const pieceMap = extractVehicles(parsed.board);
+      gameState     = {
+        ...parsed,
+        pieceMap,
+        stringBoard: boardToString(parsed.board),
+      };
+    }
+    else {
+      throw new Error("Unsupported content type");
+    }
+  } catch (e) {
+    return new Response(
+      JSON.stringify({ error: e.message }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  const game = new Game(gameState);
   console.log("🧩 Game Initialized:");
   console.log("Rows:", game.rows);
   console.log("Cols:", game.cols);
@@ -13,63 +54,29 @@ async function runAllSolvers(gameState) {
   console.log("Number of Vehicles:", game.pieceMap.size);
   console.log("Initial Board:\n" + gameState.stringBoard);
 
-  const solvers = [
-    { name: "UCS",   fn: () => game.uniformCostSearch() },
-    { name: "Greedy",fn: () => game.greedyBestFirstSearch() },
-    { name: "A*",    fn: () => game.aStarSearch() },
-  ];
+  const solvers = {
+    ucs:    () => game.uniformCostSearch(),
+    greedy: () => game.greedyBestFirstSearch(),
+    astar:  () => game.aStarSearch(),
+  };
 
-  for (const { name, fn } of solvers) {
-    const path = fn();
-    if (path) {
-      console.log(`${name} solution found in ${path.length} moves:`);
-      console.table(path);
-    } else {
-      console.log(`No solution for ${name}`);
-    }
+  const key = solverQ.toLowerCase();
+  const fn  = solvers[key];
+  if (!fn) {
+    return new Response(
+      JSON.stringify({ error: `Unknown solver "${solverQ}"` }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
+    );
   }
-}
 
-export async function POST(req) {
-  try {
-    const contentType = req.headers.get("content-type") || "";
-
-    let gameState;
-
-    if (contentType.includes("application/json")) {
-      const json = await req.json();
-      gameState   = parseGridStackJSON(json);
+  const path = fn() || [];
+  const board = game.board;
+  const kPosition = game.kPosition;  
+  return new Response(
+    JSON.stringify({ path, board, kPosition }),
+    {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
     }
-    else if (contentType.includes("multipart/form-data")) {
-      const form    = await req.formData();
-      const file    = form.get("file");
-      if (!file || typeof file === "string") {
-        return new Response("Invalid file upload", { status: 400 });
-      }
-
-      const text = await file.text();
-      try {
-        const json = JSON.parse(text);
-        gameState  = parseGridStackJSON(json);
-      } catch {
-        const parsed     = readInputBoard(text);
-        const pieceMap   = extractVehicles(parsed.board);
-        gameState        = {
-          ...parsed,
-          pieceMap,
-          stringBoard: boardToString(parsed.board),
-        };
-      }
-    }
-    else {
-      return new Response("Unsupported content type", { status: 415 });
-    }
-
-    await runAllSolvers(gameState);
-    return new Response("Game processed", { status: 200 });
-  }
-  catch (err) {
-    console.error("❌ Error:", err);
-    return new Response("Internal Server Error", { status: 500 });
-  }
+  );
 }

@@ -5,6 +5,10 @@ function parseGridStackJSON(gridJson) {
   const mainWidgets = gridJson.children.filter(c => c.id !== "main-sub-grid");
   const kWidget     = mainWidgets.find(w => w.id === "K");
 
+  if (!subGrid) {
+    throw new Error("Missing sub-grid with id 'main-sub-grid'");
+  }
+
   const rows = subGrid.h;
   const cols = subGrid.w;
 
@@ -17,6 +21,12 @@ function parseGridStackJSON(gridJson) {
   for (const w of children) {
     if (!w || w.sizeToContent) continue;
     const { id, x, y, w: wW = 1, h: wH = 1 } = w;
+    if (wW === 1 && wH === 1) {
+      throw new Error(`Vehicle '${id}' is only 1x1 — this is not allowed.`);
+    }
+    if (wW > 1 && wH > 1) {
+      throw new Error(`Vehicle '${id}' is ${wW}x${wH} — must be strictly horizontal or vertical.`);
+    }
     for (let dy = 0; dy < wH; ++dy) {
       for (let dx = 0; dx < wW; ++dx) {
         const r = y + dy;
@@ -58,6 +68,14 @@ function parseGridStackJSON(gridJson) {
   }
 
   const pieceMap = extractVehicles(board);
+
+  if (!pieceMap.has("P")) {
+    throw new Error("Missing primary vehicle 'P' in the grid");
+  }
+
+  if (!kPosition) {
+    throw new Error("Missing exit 'K' in the grid");
+  }
 
   return {
     board,
