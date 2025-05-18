@@ -21,3 +21,5 @@ class Node {
     return path.reverse();
   }
 }
+
+module.exports = { Node };
