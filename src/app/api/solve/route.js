@@ -73,7 +73,9 @@ export async function POST(req) {
 	const path = fn() || [];
 	const board = game.board;
 	const kPosition = game.kPosition;
+	const pieceMap = game.pieceMap;
 
+	const pieceMapObj = Object.fromEntries(pieceMap);
 	//TEST
 	console.table(path);
 
@@ -81,6 +83,7 @@ export async function POST(req) {
 		JSON.stringify({
 			path,
 			board,
+			pieceMap: pieceMapObj,
 			kPosition,
 			rows: game.rows,
 			cols: game.cols,

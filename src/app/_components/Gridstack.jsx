@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GridStackProvider } from "@/lib/grid-stack/grid-stack-provider";
 import { useGridStackContext } from "@/lib/grid-stack/grid-stack-context";
+import AlgoPicker from "@/app/_components/AlgoPicker";
 
 import "gridstack/dist/gridstack.css";
 import "../../styles/gridstackreact.css";
@@ -41,8 +42,9 @@ const LETTER_IDS = Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZ").filter(
 	(c) => c !== "K" && c !== "P"
 );
 
-export function SaveButton({ setCopiedOptions }) {
+export function SaveButton({ setCopiedOptions, setSolutionPath, setPieceMap }) {
 	const { saveOptions } = useGridStackContext();
+	const [solver, setSolver] = useState("ucs");
 
 	const handleSave = async () => {
 		const saved = saveOptions?.();
@@ -54,8 +56,6 @@ export function SaveButton({ setCopiedOptions }) {
 
 		setCopiedOptions?.(structuredClone(saved));
 		console.log("Saved Grid:", saved);
-
-		const solver = "astar"; // atau "ucs", "greedy"
 
 		try {
 			const res = await fetch(`/api/solve?solver=${solver}`, {
@@ -75,6 +75,17 @@ export function SaveButton({ setCopiedOptions }) {
 
 			const data = await res.json();
 			console.log("Response returned:", data);
+
+			// console.log("pieceMap keys:", Object.keys(data.pieceMap));
+			// console.log("P meta:", data.pieceMap["P"]);
+
+			if (data.path) {
+				setSolutionPath(data.path);
+			}
+
+			if (data.pieceMap) {
+				setPieceMap(data.pieceMap);
+			}
 
 			alert("Grid state sent to server successfully.");
 		} catch (err) {
@@ -237,11 +248,48 @@ export function AddPrimaryVehicle() {
 	);
 }
 
+function GridStackAnimate({ solutionPath, pieceMap }) {
+	const { moveWidget } = useGridStackContext();
+	useEffect(() => {
+		if (!solutionPath || solutionPath.length === 0) return;
+
+		let step = 0;
+
+		const interval = setInterval(() => {
+			if (step >= solutionPath.length) {
+				clearInterval(interval);
+				return;
+			}
+
+			const move = solutionPath[step];
+			const meta = pieceMap[move.piece]; // piece
+
+			// console.log("move.piece", move.piece);
+			// console.log("pieceMap:", pieceMap);
+			// console.log(meta.orientation);
+
+			if (!meta) return;
+
+			if (meta.orientation === "H") {
+				moveWidget(move.piece, move.dir, 0);
+			} else {
+				moveWidget(move.piece, 0, move.dir);
+			}
+			step++;
+		}, 50);
+		return () => clearInterval(interval);
+	}, [solutionPath, pieceMap]);
+
+	return null;
+}
+
 export function GridStackComponent() {
 	const [copiedOptions, setCopiedOptions] = useState("");
 	const [widthUnits, setWidthUnits] = useState(6);
-	const [heightUnits, setHeightUnits] = useState(6);
+	// const [heightUnits, setHeightUnits] = useState(6);
 	const cellHeight = 60;
+	const [solutionPath, setSolutionPath] = useState(null);
+	const [pieceMap, setPieceMap] = useState({});
 
 	const BASE_GRID_OPTIONS = {
 		locked: true,
@@ -263,8 +311,8 @@ export function GridStackComponent() {
 				id: "main-sub-grid",
 				x: 0,
 				y: 0,
-				w: widthUnits,
-				h: heightUnits,
+				w: 6,
+				h: 6,
 				locked: true,
 				subGridOpts: {
 					acceptWidgets: ".grid-stack-item[data-gs-group='sub']",
@@ -297,7 +345,7 @@ export function GridStackComponent() {
 						/>
 					</label>
 				</div>
-
+				{/* 
 				<div className="flex flex-col gap-2 items-start mb-2">
 					<label className="text-sm">
 						Grid rows:
@@ -313,14 +361,19 @@ export function GridStackComponent() {
 							className="border border-gray-300 rounded px-2 py-1 w-20 ml-2"
 						/>
 					</label>
-				</div>
+				</div> */}
 
 				<div className="flex h-fit">
 					<AddExit />
 					<AddObstacle />
 					<AddPrimaryVehicle />
 					<MovePrimaryVehicle />
-					<SaveButton setCopiedOptions={setCopiedOptions} />
+					<SaveButton
+						setCopiedOptions={setCopiedOptions}
+						setSolutionPath={setSolutionPath}
+						setPieceMap={setPieceMap}
+					/>
+
 					<div className="trash w-10 h-10 bg-red-300 flex justify-center items-center">
 						🗑️
 					</div>
@@ -344,6 +397,7 @@ export function GridStackComponent() {
 					</div>
 				)}
 			</div>
+			<GridStackAnimate solutionPath={solutionPath} pieceMap={pieceMap} />
 		</GridStackProvider>
 	);
 }
