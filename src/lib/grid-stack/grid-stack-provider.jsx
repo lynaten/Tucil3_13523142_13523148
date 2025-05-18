@@ -191,19 +191,38 @@ export function GridStackProvider({ children, initialOptions }) {
 		[gridStack]
 	);
 
-	const moveWidget = useCallback(
-		(id, x, y) => {
-			if (!gridStack) return;
-			const el = document.querySelector(`[gs-id="${id}"]`);
-			if (el) {
-				gridStack.move(el, { x, y });
-			}
-		},
-		[gridStack]
-	);
+const moveWidget = useCallback(
+  (id, dx = 0, dy = 0) => {
+    if (!gridStack) return;
+    const el = gridStack.el.querySelector(`[gs-id="${id}"]`);
+    if (!el) {
+      console.warn(`No widget with id="${id}" found`);
+      return;
+    }
+    const gridEl = el.closest(".grid-stack");
+    const gsInst = gridEl?.gridstack;
+    if (!gsInst) {
+      console.error("Couldn't find GridStack instance for", id);
+      return;
+    }
+    const { x, y, w, h } = el.gridstackNode;
+    gsInst.update(el, {
+      x: x + dx,
+      y: y + dy,
+      w,
+      h,
+    });
+    setRawWidgetMetaMap((prev) => {
+      const next = new Map(prev);
+      const info = next.get(id);
+      if (info) next.set(id, { ...info, x: x + dx, y: y + dy });
+        return next;
+      });
+    },
+    [gridStack]
+  );
 
 	const saveOptions = useCallback(() => {
-		// Log all widget positions
 
 		return gridStack?.save(true, true, (_, widget) => widget);
 	}, [gridStack]);

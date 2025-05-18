@@ -167,6 +167,23 @@ export function AddObstacle() {
   );
 }
 
+export function MovePrimaryVehicle() {
+  const { moveWidget } = useGridStackContext();
+
+  const handleMoveRight = () => {
+    moveWidget("P", 0, -1);
+  };
+
+  return (
+    <button
+      onClick={handleMoveRight}
+      className="bg-blue-600 px-4 py-2 text-white"
+    >
+      Move P →
+    </button>
+  );
+}
+
 export function AddPrimaryVehicle() {
 	const { addWidget, _rawWidgetMetaMap } = useGridStackContext();
 
@@ -272,6 +289,7 @@ export function GridStackComponent() {
 					<AddExit />
 					<AddObstacle />
 					<AddPrimaryVehicle />
+          <MovePrimaryVehicle />
 					<SaveButton setCopiedOptions={setCopiedOptions} />
 					<div className="trash w-10 h-10 bg-red-300 flex justify-center items-center">
 						🗑️
