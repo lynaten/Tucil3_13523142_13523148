@@ -45,43 +45,43 @@ export function SaveButton({ setCopiedOptions }) {
 	const { saveOptions } = useGridStackContext();
 
 	const handleSave = async () => {
-    const saved = saveOptions?.();
+		const saved = saveOptions?.();
 
-    if (!saved || typeof saved !== "object" || !("children" in saved)) {
-      console.warn("Failed to save grid state:", saved);
-      return;
-    }
+		if (!saved || typeof saved !== "object" || !("children" in saved)) {
+			console.warn("Failed to save grid state:", saved);
+			return;
+		}
 
-    setCopiedOptions?.(structuredClone(saved));
-    console.log("Saved Grid:", saved);
+		setCopiedOptions?.(structuredClone(saved));
+		console.log("Saved Grid:", saved);
 
-    const solver = "astar"; // atau "ucs", "greedy"
+		const solver = "astar"; // atau "ucs", "greedy"
 
-    try {
-      const res = await fetch(`/api/solve?solver=${solver}`, {
-        method: "POST",
-        body: JSON.stringify(saved),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+		try {
+			const res = await fetch(`/api/solve?solver=${solver}`, {
+				method: "POST",
+				body: JSON.stringify(saved),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
 
-      if (!res.ok) {
-        const err = await res.json();
-        alert(err.error || "Failed to process grid.");
-        console.error("Server returned error:", err);
-        return;
-      }
+			if (!res.ok) {
+				const err = await res.json();
+				alert(err.error || "Failed to process grid.");
+				console.error("Server returned error:", err);
+				return;
+			}
 
-      const data = await res.json();
-      console.log("Response returned:", data);
-      
-      alert("Grid state sent to server successfully.");
-    } catch (err) {
-      console.error("Network error:", err);
-      alert("Network or unexpected error.");
-    }
-  };
+			const data = await res.json();
+			console.log("Response returned:", data);
+
+			alert("Grid state sent to server successfully.");
+		} catch (err) {
+			console.error("Network error:", err);
+			alert("Network or unexpected error.");
+		}
+	};
 
 	return (
 		<button
@@ -141,56 +141,59 @@ export function AddExit() {
 }
 
 export function AddObstacle() {
-  const { addWidget } = useGridStackContext();
-  const [index, setIndex] = useState(0);
+	const { addWidget } = useGridStackContext();
+	const [index, setIndex] = useState(0);
 
-  const handleAdd = () => {
-    const current = index % LETTER_IDS.length;
-    const id      = LETTER_IDS[current];
-    const color   = COLORS[current % COLORS.length];
-    const text    = id;
+	const handleAdd = () => {
+		const current = index % LETTER_IDS.length;
+		const id = LETTER_IDS[current];
+		const color = COLORS[current % COLORS.length];
+		const text = id;
 
-    const widget = {
-      id,
-      x: 0,
-      y: 0,
-      w: 1,
-      h: 1,
-      locked: true,
-      group: "sub",
-      content: JSON.stringify({
-        name: "Block",
-        props: { color, text },
-      }),
-    };
+		const widget = {
+			id,
+			x: 0,
+			y: 0,
+			w: 1,
+			h: 1,
+			locked: true,
+			group: "sub",
+			content: JSON.stringify({
+				name: "Block",
+				props: { color, text },
+			}),
+		};
 
-    addWidget(() => widget, "main-sub-grid");
-    // cycle back to 0 after reaching the end
-    setIndex((prev) => (prev + 1) % LETTER_IDS.length);
-  };
+		addWidget(() => widget, "main-sub-grid");
+		// cycle back to 0 after reaching the end
+		setIndex((prev) => (prev + 1) % LETTER_IDS.length);
+	};
 
-  return (
-    <button onClick={handleAdd} className="bg-purple-600 px-4 py-2 text-white">
-      ➕ Add Obstacle
-    </button>
-  );
+	return (
+		<button
+			onClick={handleAdd}
+			className="bg-purple-600 px-4 py-2 text-white"
+		>
+			➕ Add Obstacle
+		</button>
+	);
 }
 
 export function MovePrimaryVehicle() {
-  const { moveWidget } = useGridStackContext();
+	const { moveWidget } = useGridStackContext();
 
-  const handleMoveRight = () => {
-    moveWidget("P", 0, -1);
-  };
+	const handleMoveRight = () => {
+		moveWidget("P", 0, -1);
+	};
 
-  return (
-    <button
-      onClick={handleMoveRight}
-      className="bg-blue-600 px-4 py-2 text-white"
-    >
-      Move P →
-    </button>
-  );
+	return (
+		<button
+			onClick={handleMoveRight}
+			className="bg-blue-600 px-4 py-2 text-white"
+		>
+			Move P →
+		</button>
+	);
 }
 
 export function AddPrimaryVehicle() {
@@ -198,7 +201,7 @@ export function AddPrimaryVehicle() {
 
 	const handleAdd = () => {
 		if (_rawWidgetMetaMap.value.has("P")) {
-      alert("Primary vehicle (P) has already been added.");
+			alert("Primary vehicle (P) has already been added.");
 			return;
 		}
 
@@ -237,6 +240,7 @@ export function AddPrimaryVehicle() {
 export function GridStackComponent() {
 	const [copiedOptions, setCopiedOptions] = useState("");
 	const [widthUnits, setWidthUnits] = useState(6);
+	const [heightUnits, setHeightUnits] = useState(6);
 	const cellHeight = 60;
 
 	const BASE_GRID_OPTIONS = {
@@ -259,8 +263,8 @@ export function GridStackComponent() {
 				id: "main-sub-grid",
 				x: 0,
 				y: 0,
-				w: 6,
-				h: 1,
+				w: widthUnits,
+				h: heightUnits,
 				locked: true,
 				subGridOpts: {
 					acceptWidgets: ".grid-stack-item[data-gs-group='sub']",
@@ -294,11 +298,28 @@ export function GridStackComponent() {
 					</label>
 				</div>
 
+				<div className="flex flex-col gap-2 items-start mb-2">
+					<label className="text-sm">
+						Grid rows:
+						<input
+							type="number"
+							min="1"
+							value={heightUnits}
+							onChange={(e) =>
+								setHeightUnits(
+									parseInt(e.target.value, 10) || 1
+								)
+							}
+							className="border border-gray-300 rounded px-2 py-1 w-20 ml-2"
+						/>
+					</label>
+				</div>
+
 				<div className="flex h-fit">
 					<AddExit />
 					<AddObstacle />
 					<AddPrimaryVehicle />
-          <MovePrimaryVehicle />
+					<MovePrimaryVehicle />
 					<SaveButton setCopiedOptions={setCopiedOptions} />
 					<div className="trash w-10 h-10 bg-red-300 flex justify-center items-center">
 						🗑️
