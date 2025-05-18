@@ -45,16 +45,37 @@ export function GridStackProvider({ children, initialOptions }) {
 				return;
 			}
 
-			existingInstance.on("added", (_, nodes) => {
-				console.log(
-					"[gridstack] widget added:",
-					nodes.map((n) => n.id)
-				);
-			});
+      existingInstance.on("removed", (_, items) => {
+        items.forEach((item) => {
+          const id = item.id;
+          if (id) removeWidget(id);
+        });
+      });
+
+      existingInstance.on("change", (_, items) => {
+        items.forEach((item) => {
+          const el = item.el;
+          const id = el?.gridstackNode?.id;
+
+          if (id !== "main-sub-grid") return;
+
+          const subGridEl = el.querySelector(".grid-stack");
+          const subInstance = subGridEl?.gridstack;
+          if (!subInstance) {
+            console.warn("⚠️ subgrid instance not found");
+            return;
+          }
+
+          const subItems = subInstance.getGridItems();
+          subItems.forEach((subItem) => {
+            subInstance.removeWidget(subItem);
+          });
+        });
+      });
 
 			existingInstance.on("resizestart", (_, el) => {
 				const id = el?.gridstackNode?.id;
-				console.log("[root] resizestart:", id);
+        
 
 				if (id !== "main-sub-grid") return;
 
@@ -66,58 +87,9 @@ export function GridStackProvider({ children, initialOptions }) {
 				}
 
 				const items = subInstance.getGridItems();
-				items.forEach((item) => {
-					subInstance.update(item, { w: 1, h: 1 });
-				});
-
-				console.log(
-					"[main-sub-grid] resized all items to 1x1 on resizestart"
-				);
-			});
-
-			existingInstance.on("resizestop", (_, el) => {
-				const id = el?.gridstackNode?.id;
-				console.log("[root] resizestop:", id);
-
-				if (id !== "main-sub-grid") return;
-
-				const subGridEl = el.querySelector(".grid-stack");
-				const subInstance = subGridEl?.gridstack;
-				if (!subInstance) {
-					console.warn("subgrid instance not found");
-					return;
-				}
-
-				// Remove widget pas resize
-				const items = subInstance.getGridItems();
-				items.forEach((item) => {
-					subInstance.removeWidget(item);
-				});
-				console.log(
-					"[main-sub-grid] all widgets deleted on resizestop"
-				);
-
-				// const columns = subInstance.getColumn();
-
-				// console.log(
-				// 	"[main-sub-grid] columns:",
-				// 	columns,
-				// 	"items:",
-				// 	items
-				// );
-				// let x = 0,
-				// 	y = 0;
-
-				// items.forEach((item) => {
-				// 	subInstance.update(item, { x, y });
-				// 	// x += 1;
-				// 	if (x >= columns) {
-				// 		x -= 1;
-				// 		y += 1;
-				// 	}
-				// });
-
-				// console.log("[main-sub-grid] repositioned items on resizestop");
+        items.forEach((item) => {
+          subInstance.removeWidget(item);
+        });
 			});
 
 			setGridStack(existingInstance);
@@ -127,52 +99,55 @@ export function GridStackProvider({ children, initialOptions }) {
 	const genRandomId = () =>
 		`widget-${Math.random().toString(36).substring(2, 15)}`;
 
-	const addWidget = useCallback(
-		(fn, targetId) => {
-			const tempWidget = fn();
-			const newId = tempWidget.id ?? genRandomId();
-			const widget = fn(newId);
-			widget.id = newId;
+  const addWidget = useCallback(
+    (fn, targetId) => {
+      const tempW  = fn();
+      const newId  = tempW.id ?? genRandomId();
+      const widget = fn(newId);
+      widget.id    = newId;
 
-			if (gridStack) {
-				let target = gridStack;
+      const isReplace = rawWidgetMetaMap.has(newId);
 
-				if (targetId) {
-					const subGridEl = gridStack.el.querySelector(
-						`[gs-id="${targetId}"] .grid-stack`
-					);
+      if (gridStack) {
+        let target = gridStack;
+        if (targetId) {
+          const subEl = gridStack.el.querySelector(
+            `[gs-id="${targetId}"] .grid-stack`
+          );
+          if (subEl?.gridstack?.addWidget) {
+            target = subEl.gridstack;
+          } else {
+            console.warn(
+              subEl
+                ? `Sub-grid for "${targetId}" not ready, using root.`
+                : `No sub-grid for "${targetId}", using root.`
+            );
+          }
+        }
 
-					if (subGridEl) {
-						const subGridInstance = subGridEl.gridstack;
-						if (subGridInstance?.addWidget) {
-							target = subGridInstance;
-						} else {
-							console.warn(
-								`Sub-grid element found but GridStack instance not ready yet.`
-							);
-						}
-					} else {
-						console.warn(
-							`Could not find sub-grid element for: ${targetId}. Adding to root.`
-						);
-					}
-				}
+        if (isReplace) {
+          try {
+            target.removeWidget(
+              document.querySelector(`[gs-id="${newId}"]`)
+            );
+          } catch (e) {
+            console.warn(`Failed to remove old widget ${newId}:`, e);
+          }
+        }
 
-				target.addWidget({ ...widget, id: newId });
-			} else {
-				console.warn(
-					"gridStack is null. Skipping gridStack.addWidget."
-				);
-			}
+        target.addWidget({ ...widget, id: newId });
+      } else {
+        console.warn("gridStack is null—skipping layout update.");
+      }
 
-			setRawWidgetMetaMap((prev) => {
-				const newMap = new Map(prev);
-				newMap.set(newId, widget);
-				return newMap;
-			});
-		},
-		[gridStack]
-	);
+      setRawWidgetMetaMap((prev) => {
+        const next = new Map(prev);
+        next.set(newId, widget);
+        return next;
+      });
+    },
+    [gridStack, rawWidgetMetaMap]
+  );
 
 	const addSubGrid = useCallback(
 		(fn) => {
@@ -180,7 +155,7 @@ export function GridStackProvider({ children, initialOptions }) {
 				.toString(36)
 				.substring(2, 15)}`;
 			const subWidgetIdMap = new Map();
-
+ 
 			const widget = fn(subGridId, (w) => {
 				const subId = genRandomId();
 				subWidgetIdMap.set(subId, w);

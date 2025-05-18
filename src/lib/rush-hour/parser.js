@@ -15,97 +15,60 @@ function boardToString(board) {
 }
 
 function readInputBoard(inputText) {
-	const lines = inputText.split("\n").map((l) => l.replace(/\r/g, ""));
+  const lines        = inputText.trim().split(/\r?\n/);
+  const [rows, cols] = lines[0].split(" ").map(Number);
+  const numVehicles  = Number(lines[1]);
+  const rawRows      = lines.slice(2);
 
-	let [rows, colsConfig] = lines[0].split(" ").map(Number);
-	let cols = Math.max(...lines.slice(2).map((line) => line.length));
+  let kPosition = null;
 
-	const numVehicles = Number(lines[1]);
-	const boardAll = lines.slice(2);
+  if (rawRows.length === rows + 1 && rawRows[0].includes("K")) {
+    const kCol = rawRows[0].indexOf("K");
+    kPosition  = { row: -1, col: kCol };
+    rawRows.shift();
+  }
+  else if (rawRows.length === rows + 1 && rawRows[rows].includes("K")) {
+    const kCol = rawRows[rows].indexOf("K");
+    kPosition  = { row: rows, col: kCol };
+    rawRows.pop();
+  }
 
-	let kPosition = null;
-	let boardMain = [];
+  for (let r = 0; r < rows && !kPosition; ++r) {
+    let line = (rawRows[r] || "").trimStart();
+    rawRows[r] = line;
 
-	// extrakrowidx -> -1 kalo K kiri/kanan
-	let extraKRowIdx = boardAll.findIndex((line) => {
-		const trimmed = line.replace(/ /g, "");
-		return trimmed.length === 1 && trimmed[0] === "K";
-	});
-	// console.log("extraKRowIdx", extraKRowIdx);
+    if (line.length === cols + 1 && line[0] === "K") {
+      kPosition  = { row: r, col: -1 };
+      rawRows[r] = line.slice(1);
+      break;
+    }
+    if (line.length === cols + 1 && line[cols] === "K") {
+      kPosition  = { row: r, col: cols };
+      rawRows[r] = line.slice(0, cols);
+      break;
+    }
+  }
 
-	if (extraKRowIdx !== -1) {
-		// K top/down
-		const kCol = boardAll[extraKRowIdx].indexOf("K");
-		const arr = Array(cols).fill("#");
+  if (!kPosition) {
+    throw new Error("No exit 'K' found on any side");
+  }
 
-		arr[kCol] = "K";
+  const board = rawRows.slice(0, rows).map(line => {
+    const rowStr = line
+      .padEnd(cols, ".")
+      .slice(0, cols);
+    return Array.from(rowStr, c => c === " " ? "." : c);
+  });
 
-		kPosition = { row: extraKRowIdx, col: kCol };
-
-		// blank -> titik (.)
-		boardMain = boardAll.map((line, rowIdx) => {
-			if (rowIdx === extraKRowIdx) return arr;
-			return line.split("").map((c) => (c === " " ? "." : c));
-		});
-	} else {
-		// K left/right
-		const tempBoard = boardAll.map((line) => line.split(""));
-
-		for (let c = 0; c < cols; c++) {
-			let kRow = -1;
-			let onlyK = true;
-			for (let r = 0; r < tempBoard.length; r++) {
-				// console.log(r, c);
-				const cell = tempBoard[r][c];
-				if (cell === "K") {
-					if (kRow === -1) {
-						kRow = r;
-					} else onlyK = false;
-				} else if (cell !== " " && cell !== undefined) {
-					onlyK = false;
-				}
-			}
-			// console.log("kRow: ", kRow, "onlyK: ", onlyK);
-
-			// padding # on onlyK
-			// console.log("TEST");
-			// console.log(kRow);
-
-			if (onlyK && kRow !== -1) {
-				// console.log("TEST2");
-
-				boardMain = tempBoard.map((row, r) => {
-					const arr = row.map((c) => (c === " " ? "." : c));
-					if (r !== kRow) arr[c] = "#";
-					// console.log("C ", c);
-
-					return arr;
-				});
-				kPosition = { row: kRow, col: c };
-				break;
-			}
-		}
-
-		if (!boardMain.length) {
-			boardMain = boardAll.map((line, rowIdx) => {
-				const arr = line.split("").map((c) => (c === " " ? "." : c));
-				const colIdx = arr.indexOf("K");
-				if (colIdx !== -1) {
-					kPosition = { row: rowIdx, col: colIdx };
-				}
-				return arr;
-			});
-		}
-	}
-
-	return {
-		rows,
-		cols: colsConfig,
-		numVehicles,
-		board: boardMain,
-		kPosition,
-	};
+  return {
+    rows,
+    cols,
+    numVehicles,
+    board,
+    kPosition
+  };
 }
+
 
 // TESTING
 // const parsedInput = readInputBoard(inputText);

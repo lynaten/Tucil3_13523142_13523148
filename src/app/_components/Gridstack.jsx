@@ -65,14 +65,12 @@ export function SaveButton({ setCopiedOptions }) {
 
 			if (!res.ok) {
 				console.error("Server returned error:", await res.text());
-				// alert("Server error during solving.");
 				return;
 			}
 
-			// alert("Grid state sent to server successfully.");
+			alert("Grid state sent to server successfully.");
 		} catch (err) {
 			console.error("Failed to POST saved grid:", err);
-			// alert("Failed to send grid to server.");
 		}
 	};
 
@@ -93,7 +91,7 @@ export function AddExit() {
 		const id = "K";
 
 		if (_rawWidgetMetaMap.value.has(id)) {
-			// alert("Exit (K) has already been added.");
+			alert("Exit (K) has already been added.");
 			return;
 		}
 
@@ -134,55 +132,47 @@ export function AddExit() {
 }
 
 export function AddObstacle() {
-	const { addWidget } = useGridStackContext();
-	const [index, setIndex] = useState(0);
+  const { addWidget } = useGridStackContext();
+  const [index, setIndex] = useState(0);
 
-	const handleAdd = () => {
-		if (index >= LETTER_IDS.length) {
-			// alert("Max 25 widgets reached.");
-			return;
-		}
+  const handleAdd = () => {
+    const current = index % LETTER_IDS.length;
+    const id      = LETTER_IDS[current];
+    const color   = COLORS[current % COLORS.length];
+    const text    = id;
 
-		const id = LETTER_IDS[index];
-		const color = COLORS[index % COLORS.length];
-		const text = id;
+    const widget = {
+      id,
+      x: 0,
+      y: 0,
+      w: 1,
+      h: 1,
+      locked: true,
+      group: "sub",
+      content: JSON.stringify({
+        name: "Block",
+        props: { color, text },
+      }),
+    };
 
-		const widget = {
-			id,
-			x: 0,
-			y: 0,
-			w: 1,
-			h: 1,
-			locked: true,
-			group: "sub",
-			content: JSON.stringify({
-				name: "Block",
-				props: { color, text },
-			}),
-			// sizeToContent: 3,
-		};
-		addWidget(() => widget, "main-sub-grid");
-		setIndex((prev) => prev + 1);
-	};
+    addWidget(() => widget, "main-sub-grid");
+    // cycle back to 0 after reaching the end
+    setIndex((prev) => (prev + 1) % LETTER_IDS.length);
+  };
 
-	return (
-		<button
-			onClick={handleAdd}
-			className="bg-purple-600 px-4 py-2 text-white"
-		>
-			➕ Add Obstacle
-		</button>
-	);
+  return (
+    <button onClick={handleAdd} className="bg-purple-600 px-4 py-2 text-white">
+      ➕ Add Obstacle
+    </button>
+  );
 }
 
 export function AddPrimaryVehicle() {
-	const { addWidget, _rawWidgetMetaMap } = useGridStackContext(); // ✅ use raw map for ID check
-	const [index, setIndex] = useState(0);
+	const { addWidget, _rawWidgetMetaMap } = useGridStackContext();
 
 	const handleAdd = () => {
-		// Check if widget with id "P" is already present
 		if (_rawWidgetMetaMap.value.has("P")) {
-			// alert("Primary vehicle (P) has already been added.");
+      alert("Primary vehicle (P) has already been added.");
 			return;
 		}
 
@@ -203,11 +193,9 @@ export function AddPrimaryVehicle() {
 				name: "Block",
 				props: { color, text, textColor },
 			}),
-			// sizeToContent: 3,
 		};
 
 		addWidget(() => widget, "main-sub-grid");
-		setIndex((prev) => prev + 1);
 	};
 
 	return (
@@ -245,13 +233,11 @@ export function GridStackComponent() {
 				id: "main-sub-grid",
 				x: 0,
 				y: 0,
-				w: widthUnits,
+				w: 6,
 				h: 1,
 				locked: true,
-				// sizeToContent: 3,
 				subGridOpts: {
 					acceptWidgets: ".grid-stack-item[data-gs-group='sub']",
-					// column: "auto",
 					float: true,
 					margin: 5,
 					cellHeight: cellHeight,
