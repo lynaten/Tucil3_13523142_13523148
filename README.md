@@ -9,7 +9,7 @@
 </p>
 
 <div align="center">
-  <h1>KELUARIN MOBIL MERAHHHH!!!</h1>
+  <h1>KELUARIN MOBIL MERAHHHH!! 🗣️🔥</h1>
   <i>Pilih algoritma, heuristic, dan konfigurasikan papan permainan. Biarkan program menyelesaikan puzzle untukmu.</i>
   <br>
   <b>Dikembangkan dengan ❤️ untuk IF2211 Tucil 3.</b>

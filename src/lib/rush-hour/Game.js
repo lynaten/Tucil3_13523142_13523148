@@ -142,12 +142,25 @@ Game.prototype.uniformCostSearch = function () {
 
 	const visited = new Map();
 
+	// stats
+	let nodeCount = 0;
+	const startTime = Date.now();
+
 	push(start);
 
 	while (frontier.length) {
 		const node = pop();
+		nodeCount++;
 
-		if (this.isGoal(node)) return node.getPath();
+		if (this.isGoal(node)) {
+			const endTime = Date.now();
+			let runtime = endTime - startTime;
+			return {
+				path: node.getPath(),
+				runtime,
+				nodeCount,
+			};
+		}
 
 		const key = serializeState(node.state);
 		if (visited.has(key) && visited.get(key) <= node.cost) continue;
@@ -178,13 +191,25 @@ Game.prototype.greedyBestFirstSearch = function () {
 	const pop = () => frontier.shift();
 
 	const visited = new Set();
+	// stats
+	let nodeCount = 0;
+	const startTime = Date.now();
 
 	push(start);
 
 	while (frontier.length) {
 		const node = pop();
+		nodeCount++;
 
-		if (this.isGoal(node)) return node.getPath();
+		if (this.isGoal(node)) {
+			const endTime = Date.now();
+			let runtime = endTime - startTime;
+			return {
+				path: node.getPath(),
+				runtime,
+				nodeCount,
+			};
+		}
 
 		const key = serializeState(node.state);
 		if (visited.has(key)) continue;
@@ -212,13 +237,24 @@ Game.prototype.aStarSearch = function () {
 	const pop = () => frontier.shift();
 
 	const visited = new Map();
+	let nodeCount = 0;
+	const startTime = Date.now();
 
 	push(start);
 
 	while (frontier.length) {
 		const node = pop();
+		nodeCount++;
 
-		if (this.isGoal(node)) return node.getPath();
+		if (this.isGoal(node)) {
+			const endTime = Date.now();
+			let runtime = endTime - startTime;
+			return {
+				path: node.getPath(),
+				runtime,
+				nodeCount,
+			};
+		}
 
 		const key = serializeState(node.state);
 		if (visited.has(key) && visited.get(key) <= node.cost) continue;

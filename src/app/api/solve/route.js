@@ -70,13 +70,21 @@ export async function POST(req) {
 		);
 	}
 
-	const path = fn() || [];
+	// const path = fn() || [];
+
+	let result = fn();
+	let path = result.path || result;
+	let runtime = result.runtime || 0;
+	let nodeCount = result.nodeCount || 0;
+
 	const board = game.board;
 	const kPosition = game.kPosition;
 	const pieceMap = game.pieceMap;
 
 	const pieceMapObj = Object.fromEntries(pieceMap);
-	console.log(pieceMapObj);
+	console.log(runtime);
+	console.log(nodeCount);
+	// console.log(pieceMapObj);
 	//TEST
 	console.table(path);
 
@@ -88,6 +96,8 @@ export async function POST(req) {
 			kPosition,
 			rows: game.rows,
 			cols: game.cols,
+			runtime,
+			nodeCount,
 		}),
 		{
 			status: 200,
