@@ -278,7 +278,7 @@ function GridStackAnimate({ solutionPath, pieceMap }) {
 				moveWidget(move.piece, 0, move.dir);
 			}
 			step++;
-		}, 200);
+		}, 100);
 		return () => clearInterval(interval);
 	}, [solutionPath, pieceMap]);
 
@@ -371,7 +371,7 @@ export function GridStackComponent() {
 					<AddExit />
 					<AddObstacle />
 					<AddPrimaryVehicle />
-					<MovePrimaryVehicle />
+					{/* <MovePrimaryVehicle /> */}
 					<SaveButton
 						setCopiedOptions={setCopiedOptions}
 						setSolutionPath={setSolutionPath}
