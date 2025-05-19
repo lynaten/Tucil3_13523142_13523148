@@ -76,6 +76,7 @@ export async function POST(req) {
 	const pieceMap = game.pieceMap;
 
 	const pieceMapObj = Object.fromEntries(pieceMap);
+	console.log(pieceMapObj);
 	//TEST
 	console.table(path);
 

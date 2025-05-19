@@ -42,7 +42,12 @@ const LETTER_IDS = Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZ").filter(
 	(c) => c !== "K" && c !== "P"
 );
 
-export function SaveButton({ setCopiedOptions, setSolutionPath, setPieceMap }) {
+export function SaveButton({
+	setCopiedOptions,
+	setSolutionPath,
+	setPieceMap,
+	setServerBoard,
+}) {
 	const { saveOptions } = useGridStackContext();
 	const [solver, setSolver] = useState("ucs");
 
@@ -74,17 +79,20 @@ export function SaveButton({ setCopiedOptions, setSolutionPath, setPieceMap }) {
 			}
 
 			const data = await res.json();
-			console.log("Response returned:", data);
+			// console.log(data.board);
 
 			// console.log("pieceMap keys:", Object.keys(data.pieceMap));
 			// console.log("P meta:", data.pieceMap["P"]);
-
 			if (data.path) {
 				setSolutionPath(data.path);
 			}
 
 			if (data.pieceMap) {
 				setPieceMap(data.pieceMap);
+			}
+
+			if (data.board) {
+				setServerBoard(data.board);
 			}
 
 			alert("Grid state sent to server successfully.");
@@ -106,18 +114,14 @@ export function SaveButton({ setCopiedOptions, setSolutionPath, setPieceMap }) {
 
 export function AddExit() {
 	const { addWidget, gridStack, _rawWidgetMetaMap } = useGridStackContext();
-
 	const handleAdd = () => {
 		const id = "K";
-
 		if (_rawWidgetMetaMap.value.has(id)) {
 			alert("Exit (K) has already been added.");
 			return;
 		}
-
 		const color = "bg-black";
 		const text = id;
-
 		const widget = {
 			id,
 			x: 0,
@@ -133,14 +137,12 @@ export function AddExit() {
 			}),
 			// sizeToContent: 3,
 		};
-
 		if (gridStack?.willItFit(widget)) {
 			addWidget(() => widget);
 		} else {
 			// alert("Main Grid is full.");
 		}
 	};
-
 	return (
 		<button
 			onClick={handleAdd}
@@ -276,7 +278,7 @@ function GridStackAnimate({ solutionPath, pieceMap }) {
 				moveWidget(move.piece, 0, move.dir);
 			}
 			step++;
-		}, 50);
+		}, 200);
 		return () => clearInterval(interval);
 	}, [solutionPath, pieceMap]);
 
@@ -285,11 +287,12 @@ function GridStackAnimate({ solutionPath, pieceMap }) {
 
 export function GridStackComponent() {
 	const [copiedOptions, setCopiedOptions] = useState("");
-	const [widthUnits, setWidthUnits] = useState(6);
-	// const [heightUnits, setHeightUnits] = useState(6);
+	const [widthUnits, setWidthUnits] = useState(8);
+	const [heightUnits, setHeightUnits] = useState(8);
 	const cellHeight = 60;
 	const [solutionPath, setSolutionPath] = useState(null);
 	const [pieceMap, setPieceMap] = useState({});
+	const [serverBoard, setServerBoard] = useState(null);
 
 	const BASE_GRID_OPTIONS = {
 		locked: true,
@@ -309,20 +312,20 @@ export function GridStackComponent() {
 		children: [
 			{
 				id: "main-sub-grid",
-				x: 0,
-				y: 0,
+				x: 1,
+				y: 1,
 				w: 6,
-				h: 6,
+				h: heightUnits - 2,
 				locked: true,
 				subGridOpts: {
 					acceptWidgets: ".grid-stack-item[data-gs-group='sub']",
-					float: true,
+					// float: true,
 					margin: 5,
 					cellHeight: cellHeight,
 					itemClass: "grid-stack-item",
 					removable: ".trash",
 					layout: "list",
-					minRow: 1,
+					minRow: 6,
 				},
 			},
 		],
@@ -337,16 +340,17 @@ export function GridStackComponent() {
 						<input
 							type="number"
 							min="1"
-							value={widthUnits}
+							value={widthUnits - 2}
 							onChange={(e) =>
-								setWidthUnits(parseInt(e.target.value, 10) || 1)
+								setWidthUnits(
+									parseInt(e.target.value, 10) + 2 || 1
+								)
 							}
 							className="border border-gray-300 rounded px-2 py-1 w-20 ml-2"
 						/>
 					</label>
 				</div>
-				{/* 
-				<div className="flex flex-col gap-2 items-start mb-2">
+				{/* <div className="flex flex-col gap-2 items-start mb-2">
 					<label className="text-sm">
 						Grid rows:
 						<input
@@ -355,7 +359,7 @@ export function GridStackComponent() {
 							value={heightUnits}
 							onChange={(e) =>
 								setHeightUnits(
-									parseInt(e.target.value, 10) || 1
+									parseInt(e.target.value, 10) + 2 || 1
 								)
 							}
 							className="border border-gray-300 rounded px-2 py-1 w-20 ml-2"
@@ -372,6 +376,7 @@ export function GridStackComponent() {
 						setCopiedOptions={setCopiedOptions}
 						setSolutionPath={setSolutionPath}
 						setPieceMap={setPieceMap}
+						setServerBoard={setServerBoard}
 					/>
 
 					<div className="trash w-10 h-10 bg-red-300 flex justify-center items-center">
