@@ -1,4 +1,4 @@
-# Tucil_3_13523142_13523148
+# Rush Hour Puzzle Solver
 
 > Tugas Kecil 3 IF2211 Strategi Algoritma – Penyelesaian Puzzle Rush Hour Menggunakan Algoritma Pathfinding
 
@@ -12,7 +12,7 @@
   <h1>KELUARIN MOBIL MERAHHHH!!!</h1>
   <i>Pilih algoritma, heuristic, dan konfigurasikan papan permainan. Biarkan program menyelesaikan puzzle untukmu.</i>
   <br>
-  <b>Dikembangkan dengan ❤️ untuk IF2211 Tubes 3.</b>
+  <b>Dikembangkan dengan ❤️ untuk IF2211 Tucil 3.</b>
 </div>
 
 ---
