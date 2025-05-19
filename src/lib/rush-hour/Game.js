@@ -87,42 +87,52 @@ Game.prototype.successors = function (node) {
 		const { length, orientation } = meta;
 		const { row, col } = node.state.get(sym);
 
-		{
-			const r = orientation === "H" ? row : row - 1;
-			const c = orientation === "H" ? col - 1 : col;
-			const tailOk = this._isEmpty(grid, r, c);
-			if (tailOk) {
+		for (const dir of [-1, 1]) {
+			let dist = 1;
+			while (true) {
+				const r = orientation === "H" ? row : row + dir * dist;
+				const c = orientation === "H" ? col + dir * dist : col;
+
+				let checkR;
+				if (orientation === "H") {
+					checkR = row;
+				} else {
+					// V
+					if (dir === 1) {
+						checkR = row + length - 1 + dist;
+					} else {
+						checkR = row - dist;
+					}
+				}
+
+				let checkC;
+				if (orientation === "V") {
+					checkC = col;
+				} else {
+					//h
+					if (dir === 1) {
+						checkC = col + length - 1 + dist;
+					} else {
+						checkC = col - dist;
+					}
+				}
+
+				// break kalo nabrak
+				if (!this._isEmpty(grid, checkR, checkC)) {
+					break;
+				}
+
 				const newState = new Map(node.state);
 				newState.set(sym, { row: r, col: c });
 				next.push(
 					new Node(
 						newState,
 						node,
-						{ piece: sym, dir: -1 },
+						{ piece: sym, dir, count: dist },
 						node.cost + 1
 					)
 				);
-			}
-		}
-
-		{
-			const r = orientation === "H" ? row : row + length;
-			const c = orientation === "H" ? col + length : col;
-			const headOk = this._isEmpty(grid, r, c);
-			if (headOk) {
-				const newState = new Map(node.state);
-				newState.set(sym, {
-					row: orientation === "H" ? row : row + 1,
-					col: orientation === "H" ? col + 1 : col,
-				});
-				next.push(
-					new Node(
-						newState,
-						node,
-						{ piece: sym, dir: +1 },
-						node.cost + 1
-					)
-				);
+				dist++;
 			}
 		}
 	}
