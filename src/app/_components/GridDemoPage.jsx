@@ -3,12 +3,28 @@ import { useState } from "react";
 import { GridStackComponent } from "./Gridstack";
 import AlgoPicker from "./AlgoPicker";
 
+const notes = {
+	title: "Notes:",
+	content: [
+		{
+			text: "Untuk input secara graphical, bisa drag dan resize grid maupun piece secara flexible, namun setiap kali resize dia bakal reset piece nya, jadi set board dengan resize sebelum menaruh vehicle",
+		},
+		{
+			text: "Untuk ubah row, bisa dilakukan dengan meresize grid kebawah",
+		},
+		{
+			text: "Add obstacle/vehicle akan menambah kebawah dan jika mentok ke row terakhir, perlu dipindahkan terlebih dahulu sebelum add lagi atau tidak akan keregister piece nya",
+		},
+	],
+};
+
 export default function GridDemoPage() {
 	const [file, setFile] = useState(null);
 	const [solver, setSolver] = useState("ucs");
 
 	const [uploadMessage, setUploadMessage] = useState(null);
 	const [uploadError, setUploadError] = useState(null);
+	const [parsedGame, setParsedGame] = useState(null);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -23,10 +39,9 @@ export default function GridDemoPage() {
 		const formData = new FormData();
 		formData.append("file", file);
 
-		// const solver = "astar";  atau "ucs", "greedy"
 
 		try {
-			const res = await fetch(`/api/solve?solver=${solver}`, {
+			const res = await fetch(`/api/parse`, {
 				method: "POST",
 				body: formData,
 			});
@@ -34,19 +49,16 @@ export default function GridDemoPage() {
 			if (!res.ok) {
 				const err = await res.json();
 				setUploadError(err.error || "Failed to process file.");
-				// alert(err.error || "Failed to process file.");
 				console.error("Server returned error:", err);
 				return;
 			}
 
 			const data = await res.json();
-
+			setParsedGame(data);
 			console.log("Response returned:", data);
-			setUploadMessage("Config file uploaded and processed!");
-			// alert("File uploaded and processed!");
+			setUploadMessage("Config file formatted to gridstack!");
 		} catch (err) {
 			console.error("Network error:", err);
-			// alert("Network or unexpected error.");
 			setUploadError("Network or unexpected error.");
 		}
 	};
@@ -60,11 +72,11 @@ export default function GridDemoPage() {
 
 	return (
 		<div className="flex gap-4 p-4">
-			<div className="flex flex-col">
+			<div className="flex flex-col justify-start">
 				<AlgoPicker solver={solver} setSolver={setSolver} />
-				<div className=" bg-white shadow-xl rounded-lg p-6 border  w-80 border-gray-300 mt-5 flex-1">
+				<div className=" bg-white shadow-xl rounded-lg p-6 border w-80 border-gray-300 mt-5">
 					<h2 className="text-lg font-semibold mb-4 text-gray-800">
-						Grid Solver
+						Upload .txt file
 					</h2>
 					<form
 						onSubmit={handleSubmit}
@@ -101,7 +113,7 @@ export default function GridDemoPage() {
 										: "bg-black hover:bg-gray-700 active:bg-gray-800"
 								}`}
 							>
-								Upload and Solve
+								Upload
 							</button>
 
 							{uploadMessage && (
@@ -117,21 +129,31 @@ export default function GridDemoPage() {
 							)}
 						</div>
 					</form>
+				</div>
+				<br></br>
+				<div className="bg-white rounded-lg shadow-md border border-gray-100 p-4 sticky top-6 w-80">
+					<div className="flex items-center mb-3">
+						<h3 className="text-md font-semibold text-gray-800">
+							{notes.title}
+						</h3>
+					</div>
 
-					{/* <div className="mt-4 text-xs text-gray-500">
-						Selected Algo:{" "}
-						{solver === "ucs"
-							? "Uniformed Cost Search (UCS)"
-							: solver === "greedy"
-							? "Greedy Best First Search (GBFS)"
-							: solver === "astar"
-							? "A* Search"
-							: ""}
-					</div> */}
+					<div className="space-y-3">
+						{notes.content.map((item, index) => (
+							<div
+								key={index}
+								className="border-l-3 border-black/80 pl-3"
+							>
+								<p className="text-xs text-gray-600 leading-relaxed">
+									{item.text}
+								</p>
+							</div>
+						))}
+					</div>
 				</div>
 			</div>
 			<div className="w-fit">
-				<GridStackComponent key="grid-2" />
+				<GridStackComponent parsedGame={parsedGame} key="grid-2" />
 			</div>
 		</div>
 	);
