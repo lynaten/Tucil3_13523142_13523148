@@ -26,6 +26,9 @@ export default function GridDemoPage() {
 	const [uploadError, setUploadError] = useState(null);
 	const [parsedGame, setParsedGame] = useState(null);
 
+	const [runtime, setRuntime] = useState(0);
+	const [nodeCount, setNodeCount] = useState(0);
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!file) {
@@ -38,7 +41,6 @@ export default function GridDemoPage() {
 
 		const formData = new FormData();
 		formData.append("file", file);
-
 
 		try {
 			const res = await fetch(`/api/parse`, {
@@ -54,6 +56,10 @@ export default function GridDemoPage() {
 			}
 
 			const data = await res.json();
+
+			setRuntime(data.runtime ?? 0);
+			setNodeCount(data.nodeCount ?? 0);
+
 			setParsedGame(data);
 			console.log("Response returned:", data);
 			setUploadMessage("Config file formatted to gridstack!");
@@ -76,7 +82,7 @@ export default function GridDemoPage() {
 				<AlgoPicker solver={solver} setSolver={setSolver} />
 				<div className=" bg-white shadow-xl rounded-lg p-6 border w-80 border-gray-300 mt-5">
 					<h2 className="text-lg font-semibold mb-4 text-gray-800">
-						Upload .txt file
+						Upload File
 					</h2>
 					<form
 						onSubmit={handleSubmit}
@@ -85,7 +91,7 @@ export default function GridDemoPage() {
 						<div className="form-control w-full">
 							<label className="label">
 								<span className="label-text text-sm font-medium text-gray-700">
-									Select Input File
+									Select Input File (.txt)
 								</span>
 							</label>
 							<div className="relative ">
@@ -153,7 +159,14 @@ export default function GridDemoPage() {
 				</div>
 			</div>
 			<div className="w-fit">
-				<GridStackComponent parsedGame={parsedGame} key="grid-2" />
+				<GridStackComponent
+					key="grid-2"
+					runtime={runtime}
+					nodeCount={nodeCount}
+					setRuntime={setRuntime}
+					setNodeCount={setNodeCount}
+					parsedGame={parsedGame}
+				/>
 			</div>
 		</div>
 	);
