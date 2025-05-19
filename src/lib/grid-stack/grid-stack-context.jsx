@@ -1,15 +1,16 @@
 import { createContext, useContext } from "react";
 
-// Optional: If you're using VS Code or a similar editor, JSDoc comments help with IntelliSense
 /**
  * @typedef {Object} GridStackContextType
  * @property {object} initialOptions
  * @property {object|null} gridStack
- * @property {(fn: (id: string) => object) => void} addWidget
+ * @property {(fn: (id: string) => object, targetId?: string) => void} addWidget
  * @property {(id: string) => void} removeWidget
- * @property {(id: string, x: number, y: number) => void} moveWidget
- * @property {(fn: (id: string, withWidget: (w: object) => object) => object) => void} addSubGrid
+ * @property {(id: string, x?: number, y?: number) => void} moveWidget
+ * @property {(fn: (subGridId: string, withWidget: (w: object) => object) => object) => void} addSubGrid
  * @property {() => object|object[]|undefined} saveOptions
+ * @property {(id: string, size?: {x?: number, y?: number, w?: number, h?: number}) => void} resizeWidget
+ * @property {(opts?: {cols?: number, rowH?: import("gridstack").numberOrString, targetId?: string}) => void} resizeGrid
  * @property {{ value: object|null, set: Function }} _gridStack
  * @property {{ value: Map<string, object>, set: Function }} _rawWidgetMetaMap
  */

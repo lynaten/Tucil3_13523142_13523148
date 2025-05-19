@@ -29,8 +29,8 @@
 	background: #e2e8f0;
 	border: #dee0e4 solid 2px;
 	border-radius: 8px;
-	/* inset: 8px 8px; */
-	inset: 0;
+	
+	/* inset: 0; */
 	/* overflow: hidden; */
 
 	background-image: linear-gradient(#dbd9d9 1px, transparent 3px),
@@ -48,6 +48,7 @@
 	/* take entire space */
 	position: relative;
 	inset: 0; /* TODO change top: if you have content in nested grid */
+	width: 100%
 }
 
 .w-full {

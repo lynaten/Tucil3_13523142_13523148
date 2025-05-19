@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { GridStackProvider } from "@/lib/grid-stack/grid-stack-provider";
 import { useGridStackContext } from "@/lib/grid-stack/grid-stack-context";
 import AlgoPicker from "@/app/_components/AlgoPicker";
@@ -9,6 +9,7 @@ import "gridstack/dist/gridstack.css";
 import "../../styles/gridstackreact.css";
 import GridstackInner from "./Gridstackinner";
 import { Plus, Save, Trash2 } from "lucide-react";
+
 const COLORS = [
 	"bg-pink-200",
 	"bg-rose-200",
@@ -76,10 +77,7 @@ export function SaveButton({
 			}
 
 			const data = await res.json();
-			// console.log(data.board);
 
-			// console.log("pieceMap keys:", Object.keys(data.pieceMap));
-			// console.log("P meta:", data.pieceMap["P"]);
 			if (data.path) {
 				setSolutionPath(data.path);
 			}
@@ -133,12 +131,9 @@ export function AddExit() {
 				name: "Block",
 				props: { color, text },
 			}),
-			// sizeToContent: 3,
 		};
 		if (gridStack?.willItFit(widget)) {
 			addWidget(() => widget);
-		} else {
-			// alert("Main Grid is full.");
 		}
 	};
 	return (
@@ -177,7 +172,6 @@ export function AddObstacle() {
 		};
 
 		addWidget(() => widget, "main-sub-grid");
-		// cycle back to 0 after reaching the end
 		setIndex((prev) => (prev + 1) % LETTER_IDS.length);
 	};
 
@@ -188,23 +182,6 @@ export function AddObstacle() {
 		>
 			<Plus className="h-4 w-4 mr-2" />
 			Add Obstacle
-		</button>
-	);
-}
-
-export function MovePrimaryVehicle() {
-	const { moveWidget } = useGridStackContext();
-
-	const handleMoveRight = () => {
-		moveWidget("P", 0, -1);
-	};
-
-	return (
-		<button
-			onClick={handleMoveRight}
-			className="bg-blue-600 px-4 py-3 text-white"
-		>
-			Move P →
 		</button>
 	);
 }
@@ -251,6 +228,104 @@ export function AddPrimaryVehicle() {
 	);
 }
 
+export function AddRow({ heightUnits, setHeightUnits }) {
+  const { resizeWidget, removeAllWidgetsExceptMainSubGrid } = useGridStackContext();
+
+  const handleAddRow = () => {
+    const el = document.querySelector('[gs-id="main-sub-grid"]');
+    if (!el?.gridstackNode) {
+      console.warn('main-sub-grid tidak ditemukan atau belum siap');
+      return;
+    }
+	removeAllWidgetsExceptMainSubGrid();
+
+    const { h } = el.gridstackNode;
+    resizeWidget('main-sub-grid', { h: h + 1 });
+
+    setHeightUnits(heightUnits + 1);
+  };
+
+  return (
+    <button
+      onClick={handleAddRow}
+      className="bg-sky-100 flex-1 text-sky-800 hover:bg-sky-200 px-4 py-3 flex items-center"
+    >
+      <Plus className="h-4 w-4 mr-2" />
+      Add Row
+    </button>
+  );
+}
+
+export function RemoveRow({ heightUnits, setHeightUnits }) {
+  const { resizeWidget, removeAllWidgetsExceptMainSubGrid } = useGridStackContext();
+
+  const handleRemoveRow = () => {
+    const el = document.querySelector('[gs-id="main-sub-grid"]');
+    if (!el?.gridstackNode) {
+      console.warn('main-sub-grid tidak ditemukan atau belum siap');
+      return;
+    }
+
+    const { h } = el.gridstackNode;
+
+    if (h <= 1) {
+      alert("Sub-grid must have at least 1 row.");
+      return;
+    }
+	removeAllWidgetsExceptMainSubGrid();
+
+    resizeWidget('main-sub-grid', { h: h - 1 });
+    setHeightUnits(heightUnits - 1);
+  };
+
+  return (
+    <button
+      onClick={handleRemoveRow}
+      className="bg-sky-100 text-sky-800 hover:bg-sky-200 px-4 py-3 flex items-center"
+    >
+      <Trash2 className="h-4 w-4 mr-2" />
+      Remove Row
+    </button>
+  );
+}
+
+
+export function RemoveCol({ widthUnits, setWidthUnits }) {
+  const { removeAllWidgetsExceptMainSubGrid } = useGridStackContext();
+  const handleRemoveCol = () => {
+	removeAllWidgetsExceptMainSubGrid();
+    setWidthUnits(Math.max(widthUnits - 1, 4));
+  };
+
+  return (
+    <button
+      onClick={handleRemoveCol}
+      className="bg-blue-100 text-blue-800 hover:bg-blue-200 px-4 py-3 flex items-center"
+    >
+      <Trash2 className="w-4 h-4 mr-1" />
+      Remove Col
+    </button>
+  );
+}
+
+export function AddCol({ widthUnits, setWidthUnits }) {
+  const { removeAllWidgetsExceptMainSubGrid } = useGridStackContext();
+  const handleAddCol = () => {
+	removeAllWidgetsExceptMainSubGrid();
+    setWidthUnits(widthUnits + 1);
+  };
+
+  return (
+    <button
+      onClick={handleAddCol}
+      className="bg-blue-100 text-blue-800 hover:bg-blue-200 px-4 py-3 flex-1 flex items-center"
+    >
+      <Plus className="w-4 h-4 mr-1" />
+      Add Col
+    </button>
+  );
+}
+
 function GridStackAnimate({ solutionPath, pieceMap }) {
 	const { moveWidget } = useGridStackContext();
 	useEffect(() => {
@@ -265,11 +340,7 @@ function GridStackAnimate({ solutionPath, pieceMap }) {
 			}
 
 			const move = solutionPath[step];
-			const meta = pieceMap[move.piece]; // piece
-
-			// console.log("move.piece", move.piece);
-			// console.log("pieceMap:", pieceMap);
-			// console.log(meta.orientation);
+			const meta = pieceMap[move.piece];
 
 			if (!meta) return;
 
@@ -286,115 +357,85 @@ function GridStackAnimate({ solutionPath, pieceMap }) {
 	return null;
 }
 
-export function GridStackComponent() {
+export function CellSizeInput({ cellHeight, setCellHeight }) {
+  const { setCellSize } = useGridStackContext();
+
+  const handleChange = (e) => {
+    const newSize = parseInt(e.target.value, 10);
+    if (isNaN(newSize) || newSize < 20) return;
+    setCellHeight(newSize);
+    setCellSize(newSize);
+  };
+
+  return (
+    <label className="flex items-center gap-2 text-sm text-gray-600 font-medium">
+      Cell Size:
+      <input
+        type="number"
+        min="30"
+        value={cellHeight}
+        onChange={handleChange}
+        className="border border-gray-300 rounded px-2 py-1 w-20 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+      />
+      <span className="text-gray-400 text-xs">px</span>
+    </label>
+  );
+}
+
+export function GridStackComponent({ parsedGame }) {
 	const [copiedOptions, setCopiedOptions] = useState("");
-	const [widthUnits, setWidthUnits] = useState(8);
-	const [heightUnits, setHeightUnits] = useState(8);
-	const cellHeight = 60;
+	const [widthUnits, setWidthUnits] = useState(parsedGame?.cols + 2 || 8);
+	const [heightUnits, setHeightUnits] = useState(parsedGame?.rows + 2 || 8);
+	const [cellHeight, setCellHeight] = useState(60);
 	const [solutionPath, setSolutionPath] = useState(null);
 	const [pieceMap, setPieceMap] = useState({});
 	const [serverBoard, setServerBoard] = useState(null);
 
 	const BASE_GRID_OPTIONS = {
-		locked: true,
-		acceptWidgets: ".grid-stack-item[data-gs-group='main']",
-		columnOpts: {
-			columnWidth: cellHeight,
-			columnMax: 100,
-			layout: "moveScale",
-			breakpointForWindow: false,
-		},
-		float: true,
-		itemClass: "grid-stack-item",
-		margin: 5,
-		cellHeight: cellHeight,
-		removable: ".trash",
-
-		children: [
-			{
-				id: "main-sub-grid",
-				x: 1,
-				y: 1,
-				w: 6,
-				h: heightUnits - 2,
-				locked: true,
-				subGridOpts: {
-					acceptWidgets: ".grid-stack-item[data-gs-group='sub']",
-					// float: true,
-					margin: 5,
-					cellHeight: cellHeight,
-					itemClass: "grid-stack-item",
-					removable: ".trash",
-					layout: "list",
-					minRow: 6,
-				},
+			locked: true,
+			acceptWidgets: ".grid-stack-item[data-gs-group='main']",
+			columnOpts: {
+				columnWidth: 60,
+				columnMax: 100,
+				layout: "moveScale",
+				breakpointForWindow: false,
 			},
-		],
-	};
+			float: true,
+			itemClass: "grid-stack-item",
+			margin: 0,
+			cellHeight: 60,
+			removable: ".trash",
+			children: [
+				{
+					id: "main-sub-grid",
+					x: 1,
+					y: 1,
+					w: 6,
+					h: 6,
+					noMove: true,
+					locked: true,
+					noResize: true,
+					subGridOpts: {
+						column: "auto",
+						margin: 5,
+						cellHeight: 60,
+						itemClass: "grid-stack-item",
+						removable: ".trash",
+						layout: "list",
+					},
+				},
+			],
+		};
 
 	return (
 		<GridStackProvider initialOptions={BASE_GRID_OPTIONS}>
 			<div className="flex gap-6 px-4 py-8 rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100 shadow-xl border border-gray-300">
-				<div className="flex-1 flex flex-col">
-					<div className="border bg-white rounded-lg shadow-md p-6 my-4 ml-4">
-						<div className="flex items-center justify-between mb-4">
-							<h2 className="text-lg font-bold text-gray-800">
-								Puzzle Board
-							</h2>
-							<div className="flex items-center">
-								<label className="flex items-center text-sm text-gray-600 font-medium">
-									Grid columns:
-									<input
-										type="number"
-										min="1"
-										value={widthUnits - 2}
-										onChange={(e) =>
-											setWidthUnits(
-												parseInt(e.target.value, 10) +
-													2 || 1
-											)
-										}
-										className="border border-gray-300 rounded px-3 py-1 w-20 ml-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-									/>
-								</label>
-							</div>
-						</div>
-
-						<div className=" rounded-lg p-4 overflow-auto">
-							<div
-								style={{
-									width: `${widthUnits * cellHeight}px`,
-								}}
-								className="max-w-full overflow-x-auto"
-							>
-								<GridstackInner />
-							</div>
-						</div>
-					</div>
-					{/* 
-					{copiedOptions && (
-						<div className="bg-white rounded-lg shadow-md p-4">
-							<h3 className="text-md font-semibold text-gray-700 mb-2">
-								Saved Grid (JSON)
-							</h3>
-							<div className="bg-gray-50 p-3 border border-gray-200 rounded-md">
-								<pre className="text-sm whitespace-pre-wrap break-all text-gray-700">
-									{JSON.stringify(copiedOptions, null, 2)}
-								</pre>
-							</div>
-						</div>
-					)} */}
-				</div>
-
 				<div className="w-80 shrink-0 mr-4">
 					<div className="bg-white p-5 rounded-lg shadow-md border border-gray-100 sticky z-0">
-						<div className=" mb-4 z-0">
-							<h2 className="text-lg font-bold text-gray-800">
-								Tools
-							</h2>
+						<div className="mb-4 z-0">
+							<h2 className="text-lg font-bold text-gray-800">Tools</h2>
 							<p className="text-sm text-gray-500">
-								Add, remove, and manipulate vehicles on the
-								board
+								Add, remove, and manipulate vehicles on the board
 							</p>
 						</div>
 
@@ -402,6 +443,14 @@ export function GridStackComponent() {
 							<AddPrimaryVehicle />
 							<AddObstacle />
 							<AddExit />
+							<div className="flex gap-2">
+								<AddRow heightUnits={heightUnits} setHeightUnits={setHeightUnits} />
+								<RemoveRow heightUnits={heightUnits} setHeightUnits={setHeightUnits} />
+							</div>
+							<div className="flex gap-2 w-full justify-between">
+								<AddCol widthUnits={widthUnits} setWidthUnits={setWidthUnits} />
+								<RemoveCol widthUnits={widthUnits} setWidthUnits={setWidthUnits} />
+							</div>
 
 							<div className="border-t border-gray-200"></div>
 
@@ -415,16 +464,39 @@ export function GridStackComponent() {
 							</div>
 						</div>
 					</div>
-					<button className="trash flex-1 mt-8 px-25 py-16 bg-red-500/60 animate-pulse text-white rounded-md text-xl  transition-colors flex items-center justify-center shadow-sm">
+					<button className="trash flex-1 mt-8 px-25 py-16 bg-red-500/60 animate-pulse text-white rounded-md text-xl transition-colors flex items-center justify-center shadow-sm">
 						<Trash2 size={24} className="mr-1" />
 						Drag Here
 					</button>
 				</div>
 
-				<GridStackAnimate
-					solutionPath={solutionPath}
-					pieceMap={pieceMap}
-				/>
+				<div className="flex-1 flex flex-col">
+					<div className="border bg-white rounded-lg shadow-md p-6 my-4 ml-4">
+						<div>
+							<h2 className="text-lg font-bold text-gray-800">
+								Puzzle Board ({widthUnits - 2} × {heightUnits - 2})
+							</h2>
+							<CellSizeInput cellHeight={cellHeight} setCellHeight={setCellHeight} />
+						</div>
+
+						<div className="rounded-lg p-4 overflow-auto">
+							<div
+								style={{
+									width: `${widthUnits * cellHeight}px`,
+								}}
+								className="max-w-full overflow-x-auto"
+							>
+								<GridstackInner
+									parsedGame={parsedGame}
+									setWidthUnits={setWidthUnits}
+									setHeightUnits={setHeightUnits}
+								/>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<GridStackAnimate solutionPath={solutionPath} pieceMap={pieceMap} />
 			</div>
 		</GridStackProvider>
 	);
