@@ -33,7 +33,7 @@
 	inset: 0;
 	/* overflow: hidden; */
 
-	background-image: linear-gradient(#e0e0e0 0px, transparent 1px),
+	background-image: linear-gradient(#dbd9d9 1px, transparent 3px),
 		linear-gradient(90deg, #e0e0e0 0px, transparent 0px),
 		linear-gradient(rgba(255, 255, 255, 0.3) 5px, transparent 100px),
 		linear-gradient(90deg, rgba(255, 255, 255, 0.3) 5px, transparent 100px);

@@ -46,7 +46,7 @@
 @media (prefers-color-scheme: dark) {
 	:root {
 		--background: #0a0a0a;
-		--foreground: #ededed;
+		--foreground: #f1f5f9;
 	}
 }
 
@@ -125,5 +125,9 @@
 	}
 	body {
 		@apply bg-background text-foreground;
+	}
+
+	button {
+		@apply rounded-md cursor-pointer transition-all;
 	}
 }

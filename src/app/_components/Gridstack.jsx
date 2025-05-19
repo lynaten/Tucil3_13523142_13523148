@@ -8,34 +8,31 @@ import AlgoPicker from "@/app/_components/AlgoPicker";
 import "gridstack/dist/gridstack.css";
 import "../../styles/gridstackreact.css";
 import GridstackInner from "./Gridstackinner";
-
+import { Plus, Save, Trash2 } from "lucide-react";
 const COLORS = [
-	"bg-pink-500",
-	"bg-rose-400",
-	"bg-orange-600",
-	"bg-indigo-600",
-	"bg-emerald-500",
-	"bg-yellow-600",
-	"bg-red-700",
-	"bg-blue-400",
-	"bg-purple-400",
-	"bg-green-400",
-	"bg-fuchsia-400",
-	"bg-purple-600",
-	"bg-yellow-400",
-	"bg-emerald-600",
-	"bg-indigo-400",
-	"bg-pink-400",
-	"bg-red-600",
-	"bg-teal-500",
-	"bg-teal-400",
-	"bg-green-600",
-	"bg-fuchsia-500",
-	"bg-purple-500",
-	"bg-blue-600",
-	"bg-orange-500",
-	"bg-pink-600",
-	"bg-red-500",
+	"bg-pink-200",
+	"bg-rose-200",
+	"bg-orange-200",
+	"bg-indigo-200",
+	"bg-emerald-200",
+	"bg-yellow-200",
+	"bg-blue-200",
+	"bg-purple-200",
+	"bg-green-200",
+	"bg-fuchsia-200",
+	"bg-purple-200",
+	"bg-yellow-200",
+	"bg-emerald-200",
+	"bg-indigo-200",
+	"bg-pink-200",
+	"bg-teal-200",
+	"bg-teal-200",
+	"bg-fuchsia-200",
+	"bg-purple-200",
+	"bg-blue-200",
+	"bg-orange-200",
+	"bg-pink-200",
+	"bg-cyan-200",
 ];
 
 const LETTER_IDS = Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZ").filter(
@@ -105,9 +102,10 @@ export function SaveButton({
 	return (
 		<button
 			onClick={handleSave}
-			className="bg-green-600 px-4 py-2 text-white"
+			className="flex-1 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center shadow-sm"
 		>
-			💾 Save & Solve
+			<Save size={28} className="mr-1" />
+			Save & Solve
 		</button>
 	);
 }
@@ -120,7 +118,7 @@ export function AddExit() {
 			alert("Exit (K) has already been added.");
 			return;
 		}
-		const color = "bg-black";
+		const color = "bg-green-500";
 		const text = id;
 		const widget = {
 			id,
@@ -146,9 +144,10 @@ export function AddExit() {
 	return (
 		<button
 			onClick={handleAdd}
-			className="bg-blue-600 px-4 py-2 text-white"
+			className="bg-green-100 text-green-800 rounded hover:bg-green-200 px-4 py-3  flex items-center"
 		>
-			➕ Add Exit
+			<Plus className="h-4 w-4 mr-2 " />
+			Add Exit
 		</button>
 	);
 }
@@ -185,9 +184,10 @@ export function AddObstacle() {
 	return (
 		<button
 			onClick={handleAdd}
-			className="bg-purple-600 px-4 py-2 text-white"
+			className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200 px-4 py-3 flex items-center"
 		>
-			➕ Add Obstacle
+			<Plus className="h-4 w-4 mr-2" />
+			Add Obstacle
 		</button>
 	);
 }
@@ -202,7 +202,7 @@ export function MovePrimaryVehicle() {
 	return (
 		<button
 			onClick={handleMoveRight}
-			className="bg-blue-600 px-4 py-2 text-white"
+			className="bg-blue-600 px-4 py-3 text-white"
 		>
 			Move P →
 		</button>
@@ -219,9 +219,9 @@ export function AddPrimaryVehicle() {
 		}
 
 		const id = "P";
-		const color = "bg-white";
+		const color = "bg-red-500";
 		const text = id;
-		const textColor = "text-black";
+		const textColor = "text-white";
 
 		const widget = {
 			id,
@@ -243,9 +243,10 @@ export function AddPrimaryVehicle() {
 	return (
 		<button
 			onClick={handleAdd}
-			className="bg-yellow-600 px-4 py-2 text-white"
+			className="bg-red-100 text-red-800  hover:bg-red-200 px-4 py-3  flex items-center"
 		>
-			➕ Add Primary Vehicle
+			<Plus className="h-4 w-4 mr-2" />
+			Add Primary Vehicle
 		</button>
 	);
 }
@@ -333,76 +334,98 @@ export function GridStackComponent() {
 
 	return (
 		<GridStackProvider initialOptions={BASE_GRID_OPTIONS}>
-			<div className="w-fit flex flex-col justify-center items-center">
-				<div className="flex flex-col gap-2 items-start mb-2">
-					<label className="text-sm">
-						Grid columns:
-						<input
-							type="number"
-							min="1"
-							value={widthUnits - 2}
-							onChange={(e) =>
-								setWidthUnits(
-									parseInt(e.target.value, 10) + 2 || 1
-								)
-							}
-							className="border border-gray-300 rounded px-2 py-1 w-20 ml-2"
-						/>
-					</label>
-				</div>
-				{/* <div className="flex flex-col gap-2 items-start mb-2">
-					<label className="text-sm">
-						Grid rows:
-						<input
-							type="number"
-							min="1"
-							value={heightUnits}
-							onChange={(e) =>
-								setHeightUnits(
-									parseInt(e.target.value, 10) + 2 || 1
-								)
-							}
-							className="border border-gray-300 rounded px-2 py-1 w-20 ml-2"
-						/>
-					</label>
-				</div> */}
+			<div className="flex gap-6 px-4 py-8 rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100 shadow-xl border border-gray-300">
+				<div className="flex-1 flex flex-col">
+					<div className="border bg-white rounded-lg shadow-md p-6 my-4 ml-4">
+						<div className="flex items-center justify-between mb-4">
+							<h2 className="text-lg font-bold text-gray-800">
+								Puzzle Board
+							</h2>
+							<div className="flex items-center">
+								<label className="flex items-center text-sm text-gray-600 font-medium">
+									Grid columns:
+									<input
+										type="number"
+										min="1"
+										value={widthUnits - 2}
+										onChange={(e) =>
+											setWidthUnits(
+												parseInt(e.target.value, 10) +
+													2 || 1
+											)
+										}
+										className="border border-gray-300 rounded px-3 py-1 w-20 ml-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+									/>
+								</label>
+							</div>
+						</div>
 
-				<div className="flex h-fit">
-					<AddExit />
-					<AddObstacle />
-					<AddPrimaryVehicle />
-					{/* <MovePrimaryVehicle /> */}
-					<SaveButton
-						setCopiedOptions={setCopiedOptions}
-						setSolutionPath={setSolutionPath}
-						setPieceMap={setPieceMap}
-						setServerBoard={setServerBoard}
-					/>
-
-					<div className="trash w-10 h-10 bg-red-300 flex justify-center items-center">
-						🗑️
+						<div className=" rounded-lg p-4 overflow-auto">
+							<div
+								style={{
+									width: `${widthUnits * cellHeight}px`,
+								}}
+								className="max-w-full overflow-x-auto"
+							>
+								<GridstackInner />
+							</div>
+						</div>
 					</div>
-				</div>
-				<div
-					style={{ width: `${widthUnits * cellHeight}px` }}
-					className="max-w-screen overflow-x-auto mb-16"
-				>
-					<GridstackInner />
+					{/* 
+					{copiedOptions && (
+						<div className="bg-white rounded-lg shadow-md p-4">
+							<h3 className="text-md font-semibold text-gray-700 mb-2">
+								Saved Grid (JSON)
+							</h3>
+							<div className="bg-gray-50 p-3 border border-gray-200 rounded-md">
+								<pre className="text-sm whitespace-pre-wrap break-all text-gray-700">
+									{JSON.stringify(copiedOptions, null, 2)}
+								</pre>
+							</div>
+						</div>
+					)} */}
 				</div>
 
-				{copiedOptions && (
-					<div
-						style={{ width: `${widthUnits * cellHeight}px` }}
-						className="max-w-screen mt-4 p-2 bg-gray-100 text-sm whitespace-pre-wrap break-all border border-gray-300 rounded"
-					>
-						<strong>Saved Grid (JSON):</strong>
-						<pre className=" whitespace-pre-wrap break-all">
-							{JSON.stringify(copiedOptions, null, 2)}
-						</pre>
+				<div className="w-80 shrink-0 mr-4">
+					<div className="bg-white p-5 rounded-lg shadow-md border border-gray-100 sticky z-0">
+						<div className=" mb-4 z-0">
+							<h2 className="text-lg font-bold text-gray-800">
+								Tools
+							</h2>
+							<p className="text-sm text-gray-500">
+								Add, remove, and manipulate vehicles on the
+								board
+							</p>
+						</div>
+
+						<div className="flex flex-col gap-3">
+							<AddPrimaryVehicle />
+							<AddObstacle />
+							<AddExit />
+
+							<div className="border-t border-gray-200"></div>
+
+							<div className="flex gap-3">
+								<SaveButton
+									setCopiedOptions={setCopiedOptions}
+									setSolutionPath={setSolutionPath}
+									setPieceMap={setPieceMap}
+									setServerBoard={setServerBoard}
+								/>
+							</div>
+						</div>
 					</div>
-				)}
+					<button className="trash flex-1 mt-8 px-25 py-16 bg-red-500/60 animate-pulse text-white rounded-md text-xl  transition-colors flex items-center justify-center shadow-sm">
+						<Trash2 size={24} className="mr-1" />
+						Drag Here
+					</button>
+				</div>
+
+				<GridStackAnimate
+					solutionPath={solutionPath}
+					pieceMap={pieceMap}
+				/>
 			</div>
-			<GridStackAnimate solutionPath={solutionPath} pieceMap={pieceMap} />
 		</GridStackProvider>
 	);
 }

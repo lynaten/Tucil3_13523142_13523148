@@ -5,7 +5,7 @@ import React, { useState } from "react";
 
 const AlgoPicker = ({ solver, setSolver }) => {
 	return (
-		<div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 px-8 shadow-lg flex flex-col border border-black absolute bottom-10 left-10">
+		<div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 px-8 shadow-lg flex flex-col border border-gray-300  flex-1">
 			<h2 className="text-xl font-semibold mb-2 text-black">Algorithm</h2>
 			<p className="text-gray-500 text-sm">
 				Select between UCS, GBFS, and A* search
@@ -32,8 +32,8 @@ const AlgoPicker = ({ solver, setSolver }) => {
 					</ToggleGroupItem>
 				</ToggleGroup>
 			</div>
-			<div className="mt-4 text-xs">
-				Picked:{" "}
+			<div className="mt-4 text-xs text-gray-500">
+				Selected:{" "}
 				{solver === "ucs"
 					? "Uniformed Cost Search (UCS)"
 					: solver === "greedy"
