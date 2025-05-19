@@ -1,0 +1,19 @@
+Step 1: Start
+BBB..
+A....
+APPP.
+
+Step 2: B moves Right (→)
+.BBB.
+A....
+APPP.
+
+Step 3: A moves Up (↑)
+ABBB.
+A....
+.PPP.
+
+Step 4: P moves Left (←)
+ABBB.
+A....
+PPP..

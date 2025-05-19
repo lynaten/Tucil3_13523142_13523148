@@ -157,6 +157,7 @@ Game.prototype.uniformCostSearch = function () {
 			let runtime = endTime - startTime;
 			return {
 				path: node.getPath(),
+				nodePath: node.getNodePath(),
 				runtime,
 				nodeCount,
 			};
@@ -206,6 +207,7 @@ Game.prototype.greedyBestFirstSearch = function () {
 			let runtime = endTime - startTime;
 			return {
 				path: node.getPath(),
+				nodePath: node.getNodePath(),
 				runtime,
 				nodeCount,
 			};
@@ -251,6 +253,7 @@ Game.prototype.aStarSearch = function () {
 			let runtime = endTime - startTime;
 			return {
 				path: node.getPath(),
+				nodePath: node.getNodePath(),
 				runtime,
 				nodeCount,
 			};
