@@ -157,40 +157,83 @@ Game.prototype.successors = function (node) {
 // * ======================= HEURISTICS ======================= * //
 // Heuristic jarak P ke K
 Game.prototype._heuristicDistance = function (state) {
-	const { col } = state.get("P");
-	const len = this.pieceMap.get("P").length;
-	return this.kPosition.col - (col + len);
+	const pState = state.get("P");
+
+	const piece = this.pieceMap.get("P");
+	const { row, col } = pState;
+
+	const len = piece.length;
+	const orientation = piece.orientation;
+
+	if (orientation === "H") {
+		return this.kPosition.row - (row + len);
+	} else if (orientation === "V") {
+		return this.kPosition.col - (col + len);
+	} else {
+		throw new Error("Invalid orientation");
+	}
 };
 
 // Heuristic blocking car count
 Game.prototype._heuristicBlocker = function (state) {
 	const grid = this._rebuildBoard(state);
 	const pState = state.get("P");
-	const { length } = this.pieceMap.get("P");
-	const { row, col } = pState;
 
+	const piece = this.pieceMap.get("P");
+	const { row, col } = pState;
+	const len = piece.length;
+	const orientation = piece.orientation;
 	let blockers = 0;
-	for (let c = col + length; c <= this.kPosition.col; c++) {
-		if (grid[row][c] !== null) {
-			blockers++;
+
+	if (orientation === "H") {
+		for (let c = col + len; c <= this.kPosition.col; c++) {
+			if (grid[row][c] !== null) {
+				blockers++;
+			}
 		}
+	} else if (orientation === "V") {
+		for (let r = row + len; r <= this.kPosition.row; r++) {
+			if (grid[r][col] !== null) {
+				blockers++;
+			}
+		}
+	} else {
+		throw new Error("Unknown orientation for P");
 	}
+
 	return blockers;
 };
 
 // Composite heuristic (block + distance)
 Game.prototype._heuristicComposite = function (state) {
 	const grid = this._rebuildBoard(state);
-	const { row, col } = state.get("P");
-	const len = this.pieceMap.get("P").length;
+	const pState = state.get("P");
+	const piece = this.pieceMap.get("P");
+	const { row, col } = pState;
+	const len = piece.length;
+	const orientation = piece.orientation;
 
-	let distance = this.kPosition.col - (col + len);
+	let distance = 0;
 	let blockers = 0;
-	for (let c = col + len; c <= this.kPosition.col; c++) {
-		if (grid[row][c] !== null) {
-			blockers++;
+
+	if (orientation === "H") {
+		distance = this.kPosition.col - (col + len);
+		for (let c = col + len; c <= this.kPosition.col; c++) {
+			if (grid[row][c] !== null) {
+				blockers++;
+			}
 		}
+	} else if (orientation === "V") {
+		distance = this.kPosition.row - (row + len);
+		for (let r = row + len; r <= this.kPosition.row; r++) {
+			if (grid[r][col] !== null) {
+				blockers++;
+			}
+		}
+	} else {
+		throw new Error("Unknown orientation for P");
 	}
+
 	return distance + blockers;
 };
 
