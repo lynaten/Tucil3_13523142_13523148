@@ -9,7 +9,9 @@ function getBoardOutput(board, kPosition) {
 	const rows = board.length;
 	const cols = board[0].length;
 
-	const boardToPrint = board.map((row) => [...row]);
+	const boardToPrint = board.map((row) =>
+		row.map((cell) => (cell === null ? "." : cell))
+	);
 
 	if (kPosition.row === -1 || kPosition.row === rows) {
 		const rowIdx = kPosition.row;

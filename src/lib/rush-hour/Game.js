@@ -56,7 +56,7 @@ function serializeState(state) {
 
 Game.prototype._rebuildBoard = function (state) {
 	const grid = Array.from({ length: this.rows }, () =>
-		Array(this.cols).fill(".")
+		Array(this.cols).fill(null)
 	);
 
 	for (const [sym, meta] of this.pieceMap.entries()) {
@@ -65,6 +65,10 @@ Game.prototype._rebuildBoard = function (state) {
 		for (let i = 0; i < length; ++i) {
 			const r = orientation === "H" ? row : row + i;
 			const c = orientation === "H" ? col + i : col;
+
+			if (!this._isEmpty(grid, r, c)) {
+				grid[r][c] = ".";
+			}
 			if (r < 0 || r >= this.rows || c < 0 || c >= this.cols) {
 				console.error(`Out of bounds placing '${sym}':`, {
 					r,
