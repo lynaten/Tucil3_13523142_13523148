@@ -33,7 +33,7 @@ const COLORS = [
 	"bg-cyan-200",
 ];
 
-const InnerRenderer = ({ parsedGame, setWidthUnits, setHeightUnits }) => {
+const InnerRenderer = ({ parsedGame,widthUnits, setWidthUnits, setHeightUnits }) => {
 	const {
 		addWidgetNormal,
 		removeAllWidgetsExceptMainSubGrid,
@@ -49,7 +49,7 @@ const InnerRenderer = ({ parsedGame, setWidthUnits, setHeightUnits }) => {
 
 		const widget = {
 			id,
-			x: parsedGame.kPosition.col + 1, // +1 karena subgrid mulai dari (1,1)
+			x: parsedGame.kPosition.col + 1,
 			y: parsedGame.kPosition.row + 1,
 			w: 1,
 			h: 1,
@@ -74,79 +74,97 @@ const InnerRenderer = ({ parsedGame, setWidthUnits, setHeightUnits }) => {
 
 		requestAnimationFrame(() => {
 			removeAllWidgetsExceptMainSubGrid();
+			const targetWidth = parsedGame.cols + 2;
 
-			setWidthUnits(parsedGame.cols + 2);
-			setHeightUnits(parsedGame.rows + 2);
-
-			const mainSubGridEl = document.querySelector(
-				'[gs-id="main-sub-grid"]'
-			);
-			if (mainSubGridEl?.gridstackNode) {
-				resizeWidget("main-sub-grid", { h: parsedGame.rows });
-			} else {
-				console.warn("main-sub-grid widget not found to resize.");
-			}
-
-			const subEl = gridStack.el.querySelector(
-				'[gs-id="main-sub-grid"] .grid-stack'
-			);
-			const subGrid = subEl?.gridstack;
-
-			if (!subGrid) {
-				console.warn("Subgrid is not ready yet.");
-				return;
-			}
-
-			setTimeout(() => {
-				let colorIndex = 0;
-
-				for (const [id, info] of Object.entries(parsedGame.pieceMap)) {
-					const isPrimary = info.isPrimary;
-					const color = isPrimary
-						? "bg-red-500"
-						: COLORS[colorIndex % COLORS.length];
-					const textColor = isPrimary ? "text-white" : undefined;
-					if (!isPrimary) colorIndex++;
-
-					const widget = {
-						id,
-						x: info.origin.col,
-						y: info.origin.row,
-						w: info.width,
-						h: info.height,
-						locked: true,
-						group: "sub",
-						content: JSON.stringify({
-							name: "Block",
-							props: {
-								text: id,
-								color,
-								textColor,
-							},
-						}),
-					};
-
-					addWidgetNormal(
-						() => ({
-							...widget,
-							sizeToContent: false,
-						}),
-						"main-sub-grid"
+			const step = (current) => {
+				if (current === targetWidth) {
+					const mainSubGridEl = document.querySelector(
+						'[gs-id="main-sub-grid"]'
 					);
-				}
-				handleAddKFromParsedGame();
-			}, 300);
+					if (mainSubGridEl?.gridstackNode) {
+						resizeWidget("main-sub-grid", { h: parsedGame.rows });
+					} else {
+						console.warn("main-sub-grid widget not found to resize.");
+					}
+
+					const subEl = gridStack.el.querySelector(
+						'[gs-id="main-sub-grid"] .grid-stack'
+					);
+					const subGrid = subEl?.gridstack;
+
+					if (!subGrid) {
+						console.warn("Subgrid is not ready yet.");
+						return;
+					}
+
+					setTimeout(() => {
+						let colorIndex = 0;
+
+						for (const [id, info] of Object.entries(parsedGame.pieceMap)) {
+							const isPrimary = info.isPrimary;
+							const color = isPrimary
+								? "bg-red-500"
+								: COLORS[colorIndex % COLORS.length];
+							const textColor = isPrimary ? "text-white" : undefined;
+							if (!isPrimary) colorIndex++;
+
+							const widget = {
+								id,
+								x: info.origin.col,
+								y: info.origin.row,
+								w: info.width,
+								h: info.height,
+								locked: true,
+								group: "sub",
+								content: JSON.stringify({
+									name: "Block",
+									props: {
+										text: id,
+										color,
+										textColor,
+									},
+								}),
+							};
+
+							addWidgetNormal(
+								() => ({
+									...widget,
+									sizeToContent: false,
+								}),
+								"main-sub-grid"
+							);
+						}
+						handleAddKFromParsedGame();
+					}, 200);
+					return
+				};
+
+				const next = current < targetWidth ? current + 1 : current - 1;
+
+				setTimeout(() => {
+					setWidthUnits(next);
+					step(next);
+				}, 300);
+			};
+
+			step(widthUnits);
+
+
+			setHeightUnits(parsedGame.rows + 2);
+			return;
+			
 		});
 	}, [parsedGame, gridStack]);
 
 	return <GridStackRender componentMap={COMPONENT_MAP} />;
 };
 
-const GridstackInner = ({ parsedGame, setWidthUnits, setHeightUnits }) => {
+const GridstackInner = ({ parsedGame, widthUnits, setWidthUnits, setHeightUnits }) => {
 	return (
 		<GridStackRenderProvider>
 			<InnerRenderer
 				parsedGame={parsedGame}
+				widthUnits={widthUnits}
 				setWidthUnits={setWidthUnits}
 				setHeightUnits={setHeightUnits}
 			/>

@@ -535,6 +535,7 @@ export function GridStackComponent({
 							>
 								<GridstackInner
 									parsedGame={parsedGame}
+									widthUnits={widthUnits}
 									setWidthUnits={setWidthUnits}
 									setHeightUnits={setHeightUnits}
 								/>
