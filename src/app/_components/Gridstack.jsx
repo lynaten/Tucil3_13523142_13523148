@@ -47,11 +47,14 @@ export function SaveButton({
 	setServerBoard,
 	setNodeCount,
 	setRuntime,
+	setIsSolving,
+	isSolving,
 }) {
 	const { saveOptions } = useGridStackContext();
 	const [solver, setSolver] = useState("ucs");
 
 	const handleSave = async () => {
+		setIsSolving?.(true);
 		const saved = saveOptions?.();
 
 		if (!saved || typeof saved !== "object" || !("children" in saved)) {
@@ -107,16 +110,21 @@ export function SaveButton({
 		} catch (err) {
 			console.error("Network error:", err);
 			alert("Network or unexpected error.");
+		} finally {
+			setIsSolving(false);
 		}
 	};
 
 	return (
 		<button
 			onClick={handleSave}
-			className="flex-1 px-3 py-2 font-semibold bg-emerald-600 text-white rounded-md transition-colors flex items-center justify-center shadow-sm"
+			disabled={isSolving}
+			className={`flex-1 px-3 py-2 font-semibold bg-emerald-600 text-white rounded-md transition-colors flex items-center justify-center shadow-sm ${
+				isSolving ? "opacity-50 cursor-not-allowed" : ""
+			}`}
 		>
 			<Rocket className="w-4 h-4 mr-2" />
-			Save & Solve
+			{isSolving ? "Solving..." : "Save & Solve"}
 		</button>
 	);
 }
@@ -412,6 +420,7 @@ export function GridStackComponent({
 	const [solutionPath, setSolutionPath] = useState(null);
 	const [pieceMap, setPieceMap] = useState({});
 	const [serverBoard, setServerBoard] = useState(null);
+	const [isSolving, setIsSolving] = useState(false);
 
 	const BASE_GRID_OPTIONS = {
 		locked: true,
@@ -452,7 +461,7 @@ export function GridStackComponent({
 
 	return (
 		<GridStackProvider initialOptions={BASE_GRID_OPTIONS}>
-			<div className="flex gap-6 px-10 py-8  rounded-2xl bg-gradient-to-b from-slate-200 to-slate-300 shadow-xl border border-gray-300">
+			<div className="flex gap-6 px-10 py-8  rounded-2xl bg-gradient-to-b from-slate-100 to-slate-200 shadow-xl border border-gray-300">
 				<div className="w-80 shrink-0">
 					<div className="bg-white p-5 rounded-lg shadow-md border border-gray-100 sticky z-0">
 						<div className="mb-4 z-0">
@@ -500,6 +509,8 @@ export function GridStackComponent({
 									setServerBoard={setServerBoard}
 									setRuntime={setRuntime}
 									setNodeCount={setNodeCount}
+									setIsSolving={setIsSolving}
+									isSolving={isSolving}
 								/>
 							</div>
 						</div>

@@ -5,6 +5,31 @@ import { extractVehicles } from "@/lib/rush-hour/extractor";
 
 const fs = require("fs");
 
+function validateGameState(gameState) {
+	const { rows, cols, kPosition, pieceMap } = gameState;
+	if (!kPosition) {
+		throw new Error("Missing exit 'K' in the grid");
+	}
+	if (!gameState.pieceMap || !gameState.pieceMap.has("P")) {
+		throw new Error("No primary vehicle (P) specified.");
+	}
+
+	const { row: kRow, col: kCol } = kPosition;
+
+	if (
+		(kRow === -1 && kCol === -1) ||
+		(kRow === rows && kCol === cols) ||
+		(kRow === -1 && kCol === cols) ||
+		(kRow === rows && kCol === -1)
+	) {
+		throw new Error(
+			"Invalid exit 'K' position, have to be on the edge, but not on the corner"
+		);
+	}
+
+	return true;
+}
+
 function getBoardOutput(board, kPosition) {
 	const rows = board.length;
 	const cols = board[0].length;
@@ -99,7 +124,7 @@ export async function POST(req) {
 		} else {
 			throw new Error("Unsupported content type");
 		}
-
+		validateGameState(gameState);
 		const game = new Game(gameState, heuristicQ);
 		console.log("Game Initialized:");
 		console.log("Rows:", game.rows);
@@ -139,7 +164,6 @@ export async function POST(req) {
 		const nodePath = result.nodePath || [];
 		const pieceMap = game.pieceMap;
 		const heuristic = game.heuristicName;
-		const boardWithK = getBoardOutput(board, kPosition);
 
 		console.log("TEST");
 		console.log(getBoardOutput(board, kPosition));
@@ -150,6 +174,7 @@ export async function POST(req) {
 			const board = game._rebuildBoard(node.state);
 			const boardStr = getBoardOutput(board, kPosition);
 
+			console.log(boardStr);
 			let moveDesc = "Start";
 			if (move) {
 				const orientation = pieceMap.get(move.piece).orientation;
@@ -180,6 +205,7 @@ export async function POST(req) {
 		// 	nodeCount,
 		// };
 
+		// SAVE
 		const textLog = replay
 			.map(({ step, moveDesc, board }) => {
 				return `Step ${step + 1}: ${moveDesc}\n${board}`;
