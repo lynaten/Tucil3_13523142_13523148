@@ -8,14 +8,17 @@ const notes = {
 	title: "Notes:",
 	content: [
 		{
-			text: "Untuk input secara graphical, bisa drag dan resize grid maupun piece secara flexible",
+			text: "The real input secara graphical, bisa drag dan resize grid maupun piece secara flexible, bisa main sendiri juga 😱",
 		},
 		{
-			text: "Upload file otomatis menaruh vehicle pada grid, jika sudah solve dan ingin replay, bisa click tombol upload ulang",
+			text: "Upload file otomatis menaruh vehicle pada grid, jika sudah solve dan ingin replay, bisa click tombol upload ulang 🔄",
 		},
 
 		{
-			text: "K (exit) bisa ditaruh di mana saja di sekitar grid selain di corner, jika ingin menaruh kebawah bisa dilakukan dengan dari bawah, pelan hover ke atas",
+			text: "K (exit) bisa ditaruh di mana saja di sekitar grid selain di corner, jika ingin menaruh di bawah grid, bisa dilakukan dengan hover pelan2, dari bawah grid hover masuk ke atas",
+		},
+		{
+			text: "Hasil solusi per langkah tiap save terdapat pada test/output.txt",
 		},
 	],
 };

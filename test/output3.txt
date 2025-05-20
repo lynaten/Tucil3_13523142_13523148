@@ -1,0 +1,206 @@
+Step 1: Start
+  K   
+ABBCCD
+AEPFFD
+GEP.HH
+GEIIJJ
+NNNL..
+...LMM
+
+Step 2: H moves Left (←)
+  K   
+ABBCCD
+AEPFFD
+GEPHH.
+GEIIJJ
+NNNL..
+...LMM
+
+Step 3: D moves Down (↓)
+  K   
+ABBCC.
+AEPFFD
+GEPHHD
+GEIIJJ
+NNNL..
+...LMM
+
+Step 4: C moves Right (→)
+  K   
+ABB.CC
+AEPFFD
+GEPHHD
+GEIIJJ
+NNNL..
+...LMM
+
+Step 5: B moves Right (→)
+  K   
+A.BBCC
+AEPFFD
+GEPHHD
+GEIIJJ
+NNNL..
+...LMM
+
+Step 6: E moves Up (↑)
+  K   
+AEBBCC
+AEPFFD
+GEPHHD
+G.IIJJ
+NNNL..
+...LMM
+
+Step 7: I moves Left (←)
+  K   
+AEBBCC
+AEPFFD
+GEPHHD
+GII.JJ
+NNNL..
+...LMM
+
+Step 8: L moves Up (↑)
+  K   
+AEBBCC
+AEPFFD
+GEPHHD
+GIILJJ
+NNNL..
+....MM
+
+Step 9: M moves Left (←)
+  K   
+AEBBCC
+AEPFFD
+GEPHHD
+GIILJJ
+NNNL..
+.MM...
+
+Step 10: L moves Down (↓)
+  K   
+AEBBCC
+AEPFFD
+GEPHHD
+GII.JJ
+NNNL..
+.MML..
+
+Step 11: J moves Left (←)
+  K   
+AEBBCC
+AEPFFD
+GEPHHD
+GIIJJ.
+NNNL..
+.MML..
+
+Step 12: D moves Down (↓)
+  K   
+AEBBCC
+AEPFF.
+GEPHH.
+GIIJJ.
+NNNL.D
+.MML.D
+
+Step 13: F moves Right (→)
+  K   
+AEBBCC
+AEP.FF
+GEPHH.
+GIIJJ.
+NNNL.D
+.MML.D
+
+Step 14: H moves Right (→)
+  K   
+AEBBCC
+AEP.FF
+GEP.HH
+GIIJJ.
+NNNL.D
+.MML.D
+
+Step 15: J moves Right (→)
+  K   
+AEBBCC
+AEP.FF
+GEP.HH
+GII.JJ
+NNNL.D
+.MML.D
+
+Step 16: L moves Up (↑)
+  K   
+AEBBCC
+AEPLFF
+GEPLHH
+GII.JJ
+NNN..D
+.MM..D
+
+Step 17: I moves Right (→)
+  K   
+AEBBCC
+AEPLFF
+GEPLHH
+G.IIJJ
+NNN..D
+.MM..D
+
+Step 18: E moves Down (↓)
+  K   
+A.BBCC
+AEPLFF
+GEPLHH
+GEIIJJ
+NNN..D
+.MM..D
+
+Step 19: N moves Right (→)
+  K   
+A.BBCC
+AEPLFF
+GEPLHH
+GEIIJJ
+.NNN.D
+.MM..D
+
+Step 20: G moves Down (↓)
+  K   
+A.BBCC
+AEPLFF
+.EPLHH
+GEIIJJ
+GNNN.D
+.MM..D
+
+Step 21: A moves Down (↓)
+  K   
+..BBCC
+AEPLFF
+AEPLHH
+GEIIJJ
+GNNN.D
+.MM..D
+
+Step 22: B moves Left (←)
+  K   
+BB..CC
+AEPLFF
+AEPLHH
+GEIIJJ
+GNNN.D
+.MM..D
+
+Step 23: P moves Up (↑)
+  K   
+BBP.CC
+AEPLFF
+AE.LHH
+GEIIJJ
+GNNN.D
+.MM..D
