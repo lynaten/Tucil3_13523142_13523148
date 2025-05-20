@@ -56,7 +56,7 @@ function serializeState(state) {
 
 Game.prototype._rebuildBoard = function (state) {
 	const grid = Array.from({ length: this.rows }, () =>
-		Array(this.cols).fill(null)
+		Array(this.cols).fill(".")
 	);
 
 	for (const [sym, meta] of this.pieceMap.entries()) {

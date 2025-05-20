@@ -452,7 +452,7 @@ export function GridStackComponent({
 
 	return (
 		<GridStackProvider initialOptions={BASE_GRID_OPTIONS}>
-			<div className="flex gap-6 px-10 py-8  rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100 shadow-xl border border-gray-300">
+			<div className="flex gap-6 px-10 py-8  rounded-2xl bg-gradient-to-b from-slate-200 to-slate-300 shadow-xl border border-gray-300">
 				<div className="w-80 shrink-0">
 					<div className="bg-white p-5 rounded-lg shadow-md border border-gray-100 sticky z-0">
 						<div className="mb-4 z-0">

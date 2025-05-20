@@ -5,6 +5,63 @@ import { extractVehicles } from "@/lib/rush-hour/extractor";
 
 const fs = require("fs");
 
+function getBoardOutput(board, kPosition) {
+	const rows = board.length;
+	const cols = board[0].length;
+
+	const boardToPrint = board.map((row) => [...row]);
+
+	if (kPosition.row === -1 || kPosition.row === rows) {
+		const rowIdx = kPosition.row;
+		const colIdx = kPosition.col;
+
+		const newBoard = [];
+
+		if (rowIdx === -1) {
+			const topRow = Array(cols).fill(" ");
+			topRow[colIdx] = "K";
+			newBoard.push(topRow);
+		}
+
+		for (let r = 0; r < rows; r++) {
+			newBoard.push(boardToPrint[r]);
+		}
+
+		if (rowIdx === rows) {
+			const bottomRow = Array(cols).fill(" ");
+			bottomRow[colIdx] = "K";
+			newBoard.push(bottomRow);
+		}
+
+		return newBoard.map((row) => row.join("")).join("\n");
+	}
+
+	if (kPosition.col === -1 || kPosition.col === cols) {
+		const newBoard = [];
+
+		for (let r = 0; r < rows; r++) {
+			const row = [...boardToPrint[r]];
+			if (r === kPosition.row) {
+				if (kPosition.col === -1) {
+					row.unshift("K");
+				} else {
+					row.push("K");
+				}
+			} else {
+				if (kPosition.col === -1) {
+					row.unshift(" ");
+				} else {
+					row.push(" ");
+				}
+			}
+			newBoard.push(row);
+		}
+
+		return newBoard.map((row) => row.join("")).join("\n");
+	}
+	return board.map((row) => row.join("")).join("\n");
+}
+
 export async function POST(req) {
 	const url = new URL(req.url);
 	const solverQ = url.searchParams.get("solver");
@@ -80,14 +137,16 @@ export async function POST(req) {
 		const nodePath = result.nodePath || [];
 		const pieceMap = game.pieceMap;
 		const heuristic = game.heuristicName;
+		const boardWithK = getBoardOutput(board, kPosition);
+
+		console.log("TEST");
+		console.log(getBoardOutput(board, kPosition));
 
 		// Per state replay buat save
 		const replay = nodePath.map((node, i) => {
 			const move = node.move;
 			const board = game._rebuildBoard(node.state);
-			const boardStr = board
-				.map((row) => row.map((c) => c ?? ".").join(""))
-				.join("\n");
+			const boardStr = getBoardOutput(board, kPosition);
 
 			let moveDesc = "Start";
 			if (move) {
@@ -111,13 +170,13 @@ export async function POST(req) {
 			};
 		});
 
-		const outputJSON = {
-			solver: solverQ,
-			path,
-			replay,
-			runtime,
-			nodeCount,
-		};
+		// const outputJSON = {
+		// 	solver: solverQ,
+		// 	path,
+		// 	replay,
+		// 	runtime,
+		// 	nodeCount,
+		// };
 
 		const textLog = replay
 			.map(({ step, moveDesc, board }) => {
