@@ -422,6 +422,14 @@ export function GridStackComponent({
 	const [serverBoard, setServerBoard] = useState(null);
 	const [isSolving, setIsSolving] = useState(false);
 
+	const [moveCount, setMoveCount] = useState(0);
+
+	useEffect(() => {
+		if (solutionPath) {
+			setMoveCount(solutionPath.length);
+		}
+	}, [solutionPath, setMoveCount]);
+
 	const BASE_GRID_OPTIONS = {
 		locked: true,
 		acceptWidgets: ".grid-stack-item[data-gs-group='main']",
@@ -555,6 +563,7 @@ export function GridStackComponent({
 						<div className="bg-white w-full rounded-lg ml-4 text-sm flex-col flex">
 							<span>Runtime: {runtime}</span>
 							<span>Nodes Visited: {nodeCount}</span>
+							<span>Move Count: {moveCount}</span>
 						</div>
 					</div>
 				</div>
