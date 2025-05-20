@@ -1,0 +1,9 @@
+6 6
+9
+  K   
+.DD.F.
+.BB.F.
+CCC...
+..P..E
+.APGGE
+.A...E

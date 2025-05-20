@@ -1,0 +1,44 @@
+Step 1: Start
+  K   
+.DD.F.
+.BB.F.
+CCC...
+..P..E
+.APGGE
+.A...E
+
+Step 2: D moves Left (←)
+  K   
+DD..F.
+.BB.F.
+CCC...
+..P..E
+.APGGE
+.A...E
+
+Step 3: B moves Left (←)
+  K   
+DD..F.
+BB..F.
+CCC...
+..P..E
+.APGGE
+.A...E
+
+Step 4: C moves Right (→)
+  K   
+DD..F.
+BB..F.
+...CCC
+..P..E
+.APGGE
+.A...E
+
+Step 5: P moves Up (↑)
+  K   
+DDP.F.
+BBP.F.
+...CCC
+.....E
+.A.GGE
+.A...E

@@ -1,0 +1,127 @@
+Step 1: Start
+..C.DD 
+..C..E 
+PPC..EK
+.ABBBE 
+.AGGF. 
+....F. 
+
+Step 2: D moves Left (←)
+..CDD. 
+..C..E 
+PPC..EK
+.ABBBE 
+.AGGF. 
+....F. 
+
+Step 3: E moves Up (↑)
+..CDDE 
+..C..E 
+PPC..EK
+.ABBB. 
+.AGGF. 
+....F. 
+
+Step 4: A moves Down (↓)
+..CDDE 
+..C..E 
+PPC..EK
+..BBB. 
+.AGGF. 
+.A..F. 
+
+Step 5: B moves Left (←)
+..CDDE 
+..C..E 
+PPC..EK
+.BBB.. 
+.AGGF. 
+.A..F. 
+
+Step 6: F moves Up (↑)
+..CDDE 
+..C.FE 
+PPC.FEK
+.BBB.. 
+.AGG.. 
+.A.... 
+
+Step 7: B moves Right (→)
+..CDDE 
+..C.FE 
+PPC.FEK
+...BBB 
+.AGG.. 
+.A.... 
+
+Step 8: G moves Right (→)
+..CDDE 
+..C.FE 
+PPC.FEK
+...BBB 
+.A.GG. 
+.A.... 
+
+Step 9: C moves Down (↓)
+...DDE 
+....FE 
+PP..FEK
+..CBBB 
+.ACGG. 
+.AC... 
+
+Step 10: D moves Left (←)
+DD...E 
+....FE 
+PP..FEK
+..CBBB 
+.ACGG. 
+.AC... 
+
+Step 11: F moves Up (↑)
+DD..FE 
+....FE 
+PP...EK
+..CBBB 
+.ACGG. 
+.AC... 
+
+Step 12: P moves Right (→)
+DD..FE 
+....FE 
+...PPEK
+..CBBB 
+.ACGG. 
+.AC... 
+
+Step 13: C moves Up (↑)
+DDC.FE 
+..C.FE 
+..CPPEK
+...BBB 
+.A.GG. 
+.A.... 
+
+Step 14: B moves Left (←)
+DDC.FE 
+..C.FE 
+..CPPEK
+..BBB. 
+.A.GG. 
+.A.... 
+
+Step 15: E moves Down (↓)
+DDC.F. 
+..C.F. 
+..CPP.K
+..BBBE 
+.A.GGE 
+.A...E 
+
+Step 16: P moves Right (→)
+DDC.F. 
+..C.F. 
+..C.PPK
+..BBBE 
+.A.GGE 
+.A...E 
