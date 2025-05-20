@@ -8,7 +8,7 @@ import AlgoPicker from "@/app/_components/AlgoPicker";
 import "gridstack/dist/gridstack.css";
 import "../../styles/gridstackreact.css";
 import GridstackInner from "./Gridstackinner";
-import { Plus, Save, Trash2 } from "lucide-react";
+import { Plus, Rocket, Save, Trash2, Wand2 } from "lucide-react";
 
 const COLORS = [
 	"bg-pink-200",
@@ -113,9 +113,9 @@ export function SaveButton({
 	return (
 		<button
 			onClick={handleSave}
-			className="flex-1 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center shadow-sm"
+			className="flex-1 px-3 py-2 font-semibold bg-emerald-600 text-white rounded-md transition-colors flex items-center justify-center shadow-sm"
 		>
-			<Save size={28} className="mr-1" />
+			<Rocket className="w-4 h-4 mr-2" />
 			Save & Solve
 		</button>
 	);
@@ -441,6 +441,7 @@ export function GridStackComponent({
 					column: "auto",
 					margin: 5,
 					cellHeight: 60,
+					minRow: 100,
 					itemClass: "grid-stack-item",
 					removable: ".trash",
 					layout: "list",
@@ -451,8 +452,8 @@ export function GridStackComponent({
 
 	return (
 		<GridStackProvider initialOptions={BASE_GRID_OPTIONS}>
-			<div className="flex gap-6 px-4 py-8 rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100 shadow-xl border border-gray-300">
-				<div className="w-80 shrink-0 mr-4">
+			<div className="flex gap-6 px-10 py-8  rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100 shadow-xl border border-gray-300">
+				<div className="w-80 shrink-0">
 					<div className="bg-white p-5 rounded-lg shadow-md border border-gray-100 sticky z-0">
 						<div className="mb-4 z-0">
 							<h2 className="text-lg font-bold text-gray-800">
@@ -512,17 +513,17 @@ export function GridStackComponent({
 				<div className="flex-1 flex flex-col">
 					<div className="border bg-white rounded-lg shadow-md p-6 my-4 ml-4">
 						<div>
-							<h2 className="text-lg font-bold text-gray-800">
+							<h2 className="text-lg font-bold mb-3 text-gray-800">
 								Rush Hour Solver 🚗
-								<p className="text-md text-gray-600">
-									Puzzle Board ({widthUnits - 2} ×{" "}
-									{heightUnits - 2})
-								</p>
 							</h2>
 							<CellSizeInput
 								cellHeight={cellHeight}
 								setCellHeight={setCellHeight}
 							/>
+							<span className="text-xs font-normal text-gray-600">
+								Puzzle Board ({widthUnits - 2} ×{" "}
+								{heightUnits - 2})
+							</span>
 						</div>
 
 						<div className="rounded-lg p-4 overflow-auto">
@@ -539,7 +540,7 @@ export function GridStackComponent({
 								/>
 							</div>
 						</div>
-						<div className="bg-white w-full rounded-lg ml-4 flex-col flex">
+						<div className="bg-white w-full rounded-lg ml-4 text-sm flex-col flex">
 							<span>Runtime: {runtime}</span>
 							<span>Nodes Visited: {nodeCount}</span>
 						</div>

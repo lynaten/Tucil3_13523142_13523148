@@ -2,14 +2,23 @@
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import React, { useState } from "react";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { Settings } from "lucide-react";
 
-const AlgoPicker = ({ solver, setSolver }) => {
+const AlgoPicker = ({ solver, setSolver, heuristic, setHeuristic }) => {
 	return (
 		<div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 px-8 shadow-lg flex flex-col border border-gray-300 ">
-			<h2 className="text-xl font-semibold mb-2 text-black">Algorithm</h2>
-			<p className="text-gray-500 text-sm">
-				Select between UCS, GBFS, and A* search
-			</p>
+			<div className="flex items-center mb-2">
+				<Settings className="mr-2" size={18} />
+				<h2 className="text-xl font-semibold text-black">Algorithm</h2>
+			</div>
+
 			<div className="flex items-center justify-center">
 				<ToggleGroup
 					type="single"
@@ -32,6 +41,34 @@ const AlgoPicker = ({ solver, setSolver }) => {
 					</ToggleGroupItem>
 				</ToggleGroup>
 			</div>
+			<div className="mt-4 text-xs text-gray-500">Heuristic:</div>
+			<div>
+				<Select value={heuristic} onValueChange={setHeuristic}>
+					<SelectTrigger className="w-full bg-white border-gray-300 hover:border-blue-500 transition-colors focus:ring-blue-200">
+						<SelectValue placeholder="Select a heuristic" />
+					</SelectTrigger>
+					<SelectContent className="bg-white border-gray-200">
+						<SelectItem
+							value="distance"
+							className="hover:bg-blue-50 focus:bg-blue-100 focus:text-blue-700"
+						>
+							Distance
+						</SelectItem>
+						<SelectItem
+							value="blocker"
+							className="hover:bg-blue-50 focus:bg-blue-100 focus:text-blue-700"
+						>
+							Blocker Count
+						</SelectItem>
+						<SelectItem
+							value="composite"
+							className="hover:bg-blue-50 focus:bg-blue-100 focus:text-blue-700"
+						>
+							Composite (Blocker + Distance)
+						</SelectItem>
+					</SelectContent>
+				</Select>
+			</div>
 			<div className="mt-4 text-xs text-gray-500">
 				Selected:{" "}
 				{solver === "ucs"
@@ -40,7 +77,8 @@ const AlgoPicker = ({ solver, setSolver }) => {
 					? "Greedy Best First Search (GBFS)"
 					: solver === "astar"
 					? "A* Search"
-					: ""}
+					: ""}{" "}
+				{heuristic && ` - ${heuristic} heuristic`}
 			</div>
 		</div>
 	);

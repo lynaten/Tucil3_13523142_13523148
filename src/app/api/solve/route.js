@@ -8,6 +8,7 @@ const fs = require("fs");
 export async function POST(req) {
 	const url = new URL(req.url);
 	const solverQ = url.searchParams.get("solver");
+	const heuristicQ = url.searchParams.get("heuristic") || "distance";
 	let gameState;
 
 	if (!solverQ) {
@@ -40,7 +41,7 @@ export async function POST(req) {
 			throw new Error("Unsupported content type");
 		}
 
-		const game = new Game(gameState);
+		const game = new Game(gameState, heuristicQ);
 		console.log("Game Initialized:");
 		console.log("Rows:", game.rows);
 		console.log("Cols:", game.cols);
@@ -78,6 +79,7 @@ export async function POST(req) {
 		const kPosition = game.kPosition;
 		const nodePath = result.nodePath || [];
 		const pieceMap = game.pieceMap;
+		const heuristic = game.heuristicName;
 
 		// Per state replay buat save
 		const replay = nodePath.map((node, i) => {
@@ -144,6 +146,7 @@ export async function POST(req) {
 				cols: game.cols,
 				runtime,
 				nodeCount,
+				heuristic,
 			}),
 			{
 				status: 200,

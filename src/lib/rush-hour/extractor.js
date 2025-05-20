@@ -54,11 +54,15 @@ function buildVehicleInfo(rawMap) {
 		const height = maxRow - minRow + 1;
 
 		if (width === 1 && height === 1) {
-			throw new Error(`Vehicle '${symbol}' is only 1x1 — this is not allowed.`);
+			throw new Error(
+				`Vehicle '${symbol}' is only 1x1 — this is not allowed.`
+			);
 		}
 
 		if (width > 1 && height > 1) {
-			throw new Error(`Vehicle '${symbol}' is ${width}x${height} — must be strictly horizontal or vertical.`);
+			throw new Error(
+				`Vehicle '${symbol}' is ${width}x${height} — must be strictly horizontal or vertical.`
+			);
 		}
 
 		const orientation = width > height ? "H" : "V";

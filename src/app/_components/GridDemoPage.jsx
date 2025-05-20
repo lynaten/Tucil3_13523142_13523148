@@ -2,18 +2,25 @@
 import { useState } from "react";
 import { GridStackComponent } from "./Gridstack";
 import AlgoPicker from "./AlgoPicker";
+import { Upload } from "lucide-react";
 
 const notes = {
 	title: "Notes:",
 	content: [
 		{
-			text: "Untuk input secara graphical, bisa drag dan resize grid maupun piece secara flexible, namun setiap kali resize dia bakal reset piece nya, jadi set board dengan resize sebelum menaruh vehicle",
+			text: "Untuk input secara graphical, bisa drag dan resize grid maupun piece secara flexible",
 		},
 		{
-			text: "Untuk ubah row, bisa dilakukan dengan meresize grid kebawah",
+			text: "Upload file otomatis menaruh vehicle pada grid",
 		},
 		{
-			text: "Add obstacle/vehicle akan menambah kebawah dan jika mentok ke row terakhir, perlu dipindahkan terlebih dahulu sebelum add lagi atau tidak akan keregister piece nya",
+			text: "Jika suatu piece tidak bisa langsung di taruh di lokasi tertentu, boleh dicoba-coba dulu resizenya (seperti buat 2x1/1x2)",
+		},
+		{
+			text: "K (exit) bisa ditaruh di mana saja di sekitar grid selain di corner, jika ingin menaruh kebawah bisa dilakukan dengan dari bawah, pelan hover ke atas",
+		},
+		{
+			text: "Jika suatu piece tidak bisa langsung di taruh di lokasi tertentu, boleh dicoba-coba dulu resizenya (seperti buat 2x1/1x2)",
 		},
 	],
 };
@@ -21,6 +28,7 @@ const notes = {
 export default function GridDemoPage() {
 	const [file, setFile] = useState(null);
 	const [solver, setSolver] = useState("ucs");
+	const [heuristic, setHeuristic] = useState("distance");
 
 	const [uploadMessage, setUploadMessage] = useState(null);
 	const [uploadError, setUploadError] = useState(null);
@@ -79,18 +87,27 @@ export default function GridDemoPage() {
 	return (
 		<div className="flex gap-4 p-4">
 			<div className="flex flex-col justify-start">
-				<AlgoPicker solver={solver} setSolver={setSolver} />
-				<div className=" bg-white shadow-xl rounded-lg p-6 border w-80 border-gray-300 mt-5">
-					<h2 className="text-lg font-semibold mb-4 text-gray-800">
-						Upload File
-					</h2>
+				<AlgoPicker
+					solver={solver}
+					setSolver={setSolver}
+					heuristic={heuristic}
+					setHeuristic={setHeuristic}
+				/>
+
+				<div className=" bg-white shadow-xl rounded-lg p-6 border  border-gray-300 mt-5 flex flex-col">
+					<div className="flex items-center mb-4 ">
+						<Upload size={20} className="mr-2" />
+						<h2 className="text-lg font-semibold text-gray-800">
+							Upload File
+						</h2>
+					</div>
 					<form
 						onSubmit={handleSubmit}
 						className="flex flex-col gap-4"
 					>
 						<div className="form-control w-full">
 							<label className="label">
-								<span className="label-text text-sm font-medium text-gray-700">
+								<span className="label-text text-xs font-medium text-gray-500">
 									Select Input File (.txt)
 								</span>
 							</label>
@@ -99,7 +116,7 @@ export default function GridDemoPage() {
 									type="file"
 									accept=".txt"
 									onChange={handleFileChange}
-									className="file-input file-input-bordered file-input-sm w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black hover:bg-gray-100 "
+									className="file-input file-input-bordered file-input-sm w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-black focus:border-black hover:bg-gray-100 "
 								/>
 								{file && (
 									<div className="text-xs text-gray-600 mt-1">
@@ -115,7 +132,7 @@ export default function GridDemoPage() {
 								disabled={!file}
 								className={`rounded-md py-2 px-4 font-medium text-white transition-colors ${
 									!file
-										? "bg-gray-400 cursor-not-allowed"
+										? "bg-gray-300 cursor-not-allowed"
 										: "bg-black hover:bg-gray-700 active:bg-gray-800"
 								}`}
 							>
@@ -136,8 +153,7 @@ export default function GridDemoPage() {
 						</div>
 					</form>
 				</div>
-				<br></br>
-				<div className="bg-white rounded-lg shadow-md border border-gray-100 p-4 sticky top-6 w-80">
+				<div className="bg-white mt-4  flex flex-col max-h-64 overflow-auto rounded-lg shadow-lg border border-gray-300 p-4 max-w-md">
 					<div className="flex items-center mb-3">
 						<h3 className="text-md font-semibold text-gray-800">
 							{notes.title}

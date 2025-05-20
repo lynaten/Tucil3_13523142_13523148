@@ -1,12 +1,21 @@
 const { Node } = require("./node");
 
 class Game {
-	constructor(gameState) {
+	constructor(gameState, heuristic = "distance") {
 		this.rows = gameState.rows;
 		this.cols = gameState.cols;
 		this.kPosition = gameState.kPosition;
 		this.pieceMap = gameState.pieceMap;
 		this.board = gameState.board;
+
+		this.heuristicName = heuristic;
+
+		this.heuristicFn =
+			{
+				distance: this._heuristicDistance,
+				blocker: this._heuristicBlocker,
+				composite: this._heuristicComposite,
+			}[heuristic] || this._heuristicDistance;
 	}
 
 	getInitialNode() {
@@ -17,6 +26,7 @@ class Game {
 	}
 }
 
+// * ======================= HELPER ======================= * //
 Game.prototype.isGoal = function (node) {
 	const pState = node.state.get("P");
 	const pMeta = this.pieceMap.get("P");
@@ -140,6 +150,48 @@ Game.prototype.successors = function (node) {
 	return next;
 };
 
+// * ======================= HEURISTICS ======================= * //
+// Heuristic jarak P ke K
+Game.prototype._heuristicDistance = function (state) {
+	const { col } = state.get("P");
+	const len = this.pieceMap.get("P").length;
+	return this.kPosition.col - (col + len);
+};
+
+// Heuristic blocking car count
+Game.prototype._heuristicBlocker = function (state) {
+	const grid = this._rebuildBoard(state);
+	const pState = state.get("P");
+	const { length } = this.pieceMap.get("P");
+	const { row, col } = pState;
+
+	let blockers = 0;
+	for (let c = col + length; c <= this.kPosition.col; c++) {
+		if (grid[row][c] !== null) {
+			blockers++;
+		}
+	}
+	return blockers;
+};
+
+// Composite heuristic (block + distance)
+Game.prototype._heuristicComposite = function (state) {
+	const grid = this._rebuildBoard(state);
+	const { row, col } = state.get("P");
+	const len = this.pieceMap.get("P").length;
+
+	let distance = this.kPosition.col - (col + len);
+	let blockers = 0;
+	for (let c = col + len; c <= this.kPosition.col; c++) {
+		if (grid[row][c] !== null) {
+			blockers++;
+		}
+	}
+	return distance + blockers;
+};
+
+// * ======================= ALGORITHMS ======================= * //
+
 Game.prototype.uniformCostSearch = function () {
 	const start = this.getInitialNode();
 
@@ -183,12 +235,6 @@ Game.prototype.uniformCostSearch = function () {
 	return null;
 };
 
-Game.prototype._heuristic = function (state) {
-	const { col } = state.get("P");
-	const len = this.pieceMap.get("P").length;
-	return this.kPosition.col - (col + len);
-};
-
 Game.prototype.greedyBestFirstSearch = function () {
 	const start = this.getInitialNode();
 
@@ -196,7 +242,7 @@ Game.prototype.greedyBestFirstSearch = function () {
 	const push = (n) => {
 		frontier.push(n);
 		frontier.sort(
-			(a, b) => this._heuristic(a.state) - this._heuristic(b.state)
+			(a, b) => this.heuristicFn(a.state) - this.heuristicFn(b.state)
 		);
 	};
 	const pop = () => frontier.shift();
@@ -242,8 +288,8 @@ Game.prototype.aStarSearch = function () {
 		frontier.sort(
 			(a, b) =>
 				a.cost +
-				this._heuristic(a.state) -
-				(b.cost + this._heuristic(b.state))
+				this.heuristicFn(a.state) -
+				(b.cost + this.heuristicFn(b.state))
 		);
 	};
 	const pop = () => frontier.shift();

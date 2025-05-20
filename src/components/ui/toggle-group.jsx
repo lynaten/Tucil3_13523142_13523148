@@ -46,8 +46,8 @@ function ToggleGroupItem({ className, children, variant, size, ...props }) {
 				}),
 				"min-w-0 flex-1 shrink-0 rounded-none shadow-none first:rounded-l-md last:rounded-r-md focus:z-10 focus-visible:z-10 data-[variant=outline]:border-l-0 data-[variant=outline]:first:border-l cursor-pointer group/toggle-item",
 				"hover:z-10",
-				"data-[state=on]:hover:bg-black/10 data-[state=on]:hover:text-black",
-				"dark:data-[state=on]:hover:bg-white/10 dark:data-[state=on]:hover:text-white",
+				"data-[state=on]:hover:bg-blue-500/10 data-[state=on]:hover:text-blue-500",
+				"dark:data-[state=on]:hover:bg-blue-500/10 dark:data-[state=on]:hover:text-blue-500",
 				className
 			)}
 			{...props}
