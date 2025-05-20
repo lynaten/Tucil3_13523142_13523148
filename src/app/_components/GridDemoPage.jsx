@@ -11,16 +11,11 @@ const notes = {
 			text: "Untuk input secara graphical, bisa drag dan resize grid maupun piece secara flexible",
 		},
 		{
-			text: "Upload file otomatis menaruh vehicle pada grid",
+			text: "Upload file otomatis menaruh vehicle pada grid, jika sudah solve dan ingin replay, bisa click tombol upload ulang",
 		},
-		{
-			text: "Jika suatu piece tidak bisa langsung di taruh di lokasi tertentu, boleh dicoba-coba dulu resizenya (seperti buat 2x1/1x2)",
-		},
+
 		{
 			text: "K (exit) bisa ditaruh di mana saja di sekitar grid selain di corner, jika ingin menaruh kebawah bisa dilakukan dengan dari bawah, pelan hover ke atas",
-		},
-		{
-			text: "Jika suatu piece tidak bisa langsung di taruh di lokasi tertentu, boleh dicoba-coba dulu resizenya (seperti buat 2x1/1x2)",
 		},
 	],
 };

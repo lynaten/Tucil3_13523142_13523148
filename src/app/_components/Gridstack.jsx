@@ -521,8 +521,8 @@ export function GridStackComponent({
 								setCellHeight={setCellHeight}
 							/>
 							<span className="text-xs font-normal text-gray-600">
-								Puzzle Board ({widthUnits - 2} ×{" "}
-								{heightUnits - 2})
+								Puzzle Board ({heightUnits - 2} ×{" "}
+								{widthUnits - 2})
 							</span>
 						</div>
 
