@@ -20,7 +20,7 @@ function readInputBoard(inputText) {
 	const lines = inputText.trimEnd().split(/\r?\n/);
 	//   console.log("[DEBUG] Total lines:", lines.length);
 
-	const [cols, rows] = lines[0].trim().split(/\s+/).map(Number);
+	const [rows, cols] = lines[0].trim().split(/\s+/).map(Number);
 	//   console.log(cols,rows);
 	const numVehicles = Number(lines[1].trim());
 	//   console.log(`[DEBUG] Parsed rows: ${rows}, cols: ${cols}, numVehicles: ${numVehicles}`);
@@ -51,13 +51,13 @@ function readInputBoard(inputText) {
 		const line = rawRows[r] ?? "";
 		if (line.startsWith("K")) {
 			kPosition = { row: r, col: -1 };
-			//   console.log("[DEBUG] Found K on left edge at row", r);
+			  console.log("[DEBUG] Found K on left edge at row", r);
 			replaceK(r, 0);
 			break;
 		}
 		if (line.length > cols && line[cols] === "K") {
 			kPosition = { row: r, col: cols };
-			//   console.log("[DEBUG] Found K on right edge at row", r);
+			  console.log("[DEBUG] Found K on right edge at row", r);
 			replaceK(r, cols);
 			break;
 		}

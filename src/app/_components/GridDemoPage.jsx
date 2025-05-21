@@ -20,6 +20,7 @@ const notes = {
 		{
 			text: "Hasil solusi per langkah tiap save terdapat pada test/output.txt",
 		},
+		{ text: "Dimensi A B nya dalam txt diasumsi sebagai row x col"},
 	],
 };
 

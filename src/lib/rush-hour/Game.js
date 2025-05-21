@@ -62,13 +62,11 @@ Game.prototype._rebuildBoard = function (state) {
 	for (const [sym, meta] of this.pieceMap.entries()) {
 		const { length, orientation } = meta;
 		const { row, col } = state.get(sym);
+
 		for (let i = 0; i < length; ++i) {
 			const r = orientation === "H" ? row : row + i;
 			const c = orientation === "H" ? col + i : col;
 
-			if (!this._isEmpty(grid, r, c)) {
-				grid[r][c] = ".";
-			}
 			if (r < 0 || r >= this.rows || c < 0 || c >= this.cols) {
 				console.error(`Out of bounds placing '${sym}':`, {
 					r,
@@ -76,12 +74,20 @@ Game.prototype._rebuildBoard = function (state) {
 					thisRows: this.rows,
 					thisCols: this.cols,
 				});
+				continue;
 			}
+
+			if (grid[r][c] !== null) {
+				console.warn(`Overwriting occupied cell at (${r}, ${c}) by '${sym}'`);
+			}
+
 			grid[r][c] = sym;
 		}
 	}
+
 	return grid;
 };
+
 
 Game.prototype._isEmpty = function (grid, r, c) {
 	return (
@@ -157,21 +163,21 @@ Game.prototype.successors = function (node) {
 // * ======================= HEURISTICS ======================= * //
 // Heuristic jarak P ke K
 Game.prototype._heuristicDistance = function (state) {
-	const pState = state.get("P");
+    const pState = state.get("P");
 
-	const piece = this.pieceMap.get("P");
-	const { row, col } = pState;
+    const piece = this.pieceMap.get("P");
+    const { row, col } = pState;
 
-	const len = piece.length;
-	const orientation = piece.orientation;
+    const len = piece.length;
+    const orientation = piece.orientation;
 
-	if (orientation === "H") {
-		return this.kPosition.row - (row + len);
-	} else if (orientation === "V") {
-		return this.kPosition.col - (col + len);
-	} else {
-		throw new Error("Invalid orientation");
-	}
+    if (orientation === "H") {
+        return this.kPosition.col - (col + len);
+    } else if (orientation === "V") {
+        return this.kPosition.row - (row + len);
+    } else {
+        throw new Error("Invalid orientation");
+    }
 };
 
 // Heuristic blocking car count
@@ -243,9 +249,11 @@ Game.prototype.uniformCostSearch = function () {
 	const start = this.getInitialNode();
 
 	const frontier = [];
+	const sort = () => {
+		frontier.sort((a, b) => a.cost - b.cost);
+	}
 	const push = (n) => {
 		frontier.push(n);
-		frontier.sort((a, b) => a.cost - b.cost);
 	};
 	const pop = () => frontier.shift();
 
@@ -259,7 +267,6 @@ Game.prototype.uniformCostSearch = function () {
 
 	while (frontier.length) {
 		const node = pop();
-		nodeCount++;
 
 		if (this.isGoal(node)) {
 			const endTime = Date.now();
@@ -275,8 +282,9 @@ Game.prototype.uniformCostSearch = function () {
 		const key = serializeState(node.state);
 		if (visited.has(key) && visited.get(key) <= node.cost) continue;
 		visited.set(key, node.cost);
-
+		nodeCount++;
 		for (const child of this.successors(node)) push(child);
+		sort();
 	}
 
 	return null;
@@ -286,16 +294,17 @@ Game.prototype.greedyBestFirstSearch = function () {
 	const start = this.getInitialNode();
 
 	const frontier = [];
-	const push = (n) => {
-		frontier.push(n);
+	const sort = () => {
 		frontier.sort(
 			(a, b) => this.heuristicFn(a.state) - this.heuristicFn(b.state)
 		);
+	}
+	const push = (n) => {
+		frontier.push(n);
 	};
 	const pop = () => frontier.shift();
 
 	const visited = new Set();
-	// stats
 	let nodeCount = 0;
 	const startTime = Date.now();
 
@@ -303,8 +312,7 @@ Game.prototype.greedyBestFirstSearch = function () {
 
 	while (frontier.length) {
 		const node = pop();
-		nodeCount++;
-
+		
 		if (this.isGoal(node)) {
 			const endTime = Date.now();
 			let runtime = endTime - startTime;
@@ -318,9 +326,10 @@ Game.prototype.greedyBestFirstSearch = function () {
 
 		const key = serializeState(node.state);
 		if (visited.has(key)) continue;
+		nodeCount++;
 		visited.add(key);
-
 		for (const child of this.successors(node)) push(child);
+		sort();
 	}
 
 	return null;
@@ -330,14 +339,16 @@ Game.prototype.aStarSearch = function () {
 	const start = this.getInitialNode();
 
 	const frontier = [];
-	const push = (n) => {
-		frontier.push(n);
+	const sort = () =>{
 		frontier.sort(
 			(a, b) =>
 				a.cost +
 				this.heuristicFn(a.state) -
 				(b.cost + this.heuristicFn(b.state))
 		);
+	}
+	const push = (n) => {
+		frontier.push(n);
 	};
 	const pop = () => frontier.shift();
 
@@ -349,7 +360,6 @@ Game.prototype.aStarSearch = function () {
 
 	while (frontier.length) {
 		const node = pop();
-		nodeCount++;
 
 		if (this.isGoal(node)) {
 			const endTime = Date.now();
@@ -364,9 +374,11 @@ Game.prototype.aStarSearch = function () {
 
 		const key = serializeState(node.state);
 		if (visited.has(key) && visited.get(key) <= node.cost) continue;
-		visited.set(key, node.cost);
 
+		nodeCount++;
+		visited.set(key, node.cost);
 		for (const child of this.successors(node)) push(child);
+		sort();
 	}
 
 	return null;
