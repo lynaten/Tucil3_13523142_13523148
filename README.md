@@ -24,7 +24,7 @@
 -   **Visualisasi Pergerakan Mobil**: Input papan secara langsung, lihat langkah-langkah pergerakan mobil secara otomatis
 -   **Web-based Interface**: Fleksibel dan modern dengan drag-and-drop resizable grid layout
 -   **Statistic Output**: Tampilkan jumlah node yang dikunjungi dan waktu eksekusi
--   **Output File**: Test cases di folder `test` dan output save di 'test/output.txt'
+-   **Output File**: Test cases di folder `test` dan output save dapat dilihat di 'test/output.txt'
 
 <p align="left">
     <a href="https://www.javascript.com/">

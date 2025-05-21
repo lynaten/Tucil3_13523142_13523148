@@ -374,7 +374,7 @@ function GridStackAnimate({ solutionPath, pieceMap }) {
 				moveWidget(move.piece, 0, move.dir * count);
 			}
 			step++;
-		}, 100);
+		}, 300);
 		return () => clearInterval(interval);
 	}, [solutionPath, pieceMap]);
 
