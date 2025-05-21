@@ -13,14 +13,16 @@ const notes = {
 		{
 			text: "Upload file otomatis menaruh vehicle pada grid, jika sudah solve dan ingin replay, bisa click tombol upload ulang 🔄",
 		},
-
+		{
+			text: "Setiap kali solve, click tombol upload ulang jika ingin mengubah solver algo atau heuristic",
+		},
 		{
 			text: "K (exit) bisa ditaruh di mana saja di sekitar grid selain di corner, jika ingin menaruh di bawah grid, bisa dilakukan dengan hover pelan2, dari bawah grid hover masuk ke atas",
 		},
 		{
 			text: "Hasil solusi per langkah tiap save terdapat pada test/output.txt",
 		},
-		{ text: "Dimensi A B nya dalam txt diasumsi sebagai row x col"},
+		{ text: "Dimensi A B nya dalam txt diasumsi sebagai row x col" },
 	],
 };
 
