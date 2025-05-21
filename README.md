@@ -9,7 +9,7 @@
 </p>
 
 <div align="center">
-  <h1>KELUARIN MOBIL MERAHHHH!! 🗣️🔥</h1>
+  <h1>KELUARIN MOBIL MERAHHHH!!! 🗣️🔥</h1>
   <i>Pilih algoritma, heuristic, dan konfigurasikan papan permainan. Biarkan program menyelesaikan puzzle untukmu.</i>
   <br>
   <b>Dikembangkan dengan ❤️ untuk IF2211 Tucil 3.</b>
@@ -24,6 +24,7 @@
 -   **Visualisasi Pergerakan Mobil**: Input papan secara langsung, lihat langkah-langkah pergerakan mobil secara otomatis
 -   **Web-based Interface**: Fleksibel dan modern dengan drag-and-drop resizable grid layout
 -   **Statistic Output**: Tampilkan jumlah node yang dikunjungi dan waktu eksekusi
+-   **Output File**: Test cases di folder `test` dan output save di 'test/output.txt'
 
 <p align="left">
     <a href="https://www.javascript.com/">
@@ -58,13 +59,13 @@ Or download the source code (.zip) from the [latest release](https://github.com/
 ### 2 . Install NPM packages
 
 ```sh
-   npm install
+npm install
 ```
 
 ### 3. Run the app
 
 ```sh
-  npm run dev
+npm run dev
 ```
 
 ---
@@ -72,11 +73,13 @@ Or download the source code (.zip) from the [latest release](https://github.com/
 ## 🚧 Room for Improvement
 
 -   Reoptimize the search algorithms for faster performance
+-   Add extra search algorithms
 -   Better UI/UX and responsive design
 
 ```
 Tucil3_13523142_13523148/
 ├── README.md
+├── test/
 ├── components.json
 ├── eslint.config.mjs
 ├── next.config.mjs
@@ -91,6 +94,8 @@ Tucil3_13523142_13523148/
 │   │   │   ├── Gridstack.jsx
 │   │   │   └── Gridstackinner.jsx
 │   │   ├── api/
+│   │   │   ├── parse/
+│   │   │   │   └── route.js
 │   │   │   └── solve/
 │   │   │       └── route.js
 │   │   ├── layout.jsx

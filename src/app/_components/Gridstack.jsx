@@ -561,7 +561,7 @@ export function GridStackComponent({
 							</div>
 						</div>
 						<div className="bg-white w-full rounded-lg ml-4 text-sm flex-col flex">
-							<span>Runtime: {runtime}</span>
+							<span>Runtime: {runtime}ms</span>
 							<span>Nodes Visited: {nodeCount}</span>
 							<span>Move Count: {moveCount}</span>
 						</div>
